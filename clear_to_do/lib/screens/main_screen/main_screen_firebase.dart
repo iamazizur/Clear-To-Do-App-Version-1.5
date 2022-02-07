@@ -22,6 +22,7 @@ FirebaseFirestore _tasks = FirebaseFirestore.instance;
 class _MainScreenFirebaseState extends State<MainScreenFirebase> {
   @override
   Widget build(BuildContext context) {
+    var color = Colors.black;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -38,76 +39,214 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
                 title: 'Create new item',
               ),
             ),
-            Expanded(flex: 8, child: StreamsLists()),
+            Expanded(flex: 8, child: IncompletedListStreams()),
+            Expanded(
+                child: Container(
+              color: Colors.cyan,
+            )),
           ],
         ),
       ),
     );
   }
 
-  Future<void> addTitle(String userGeneratedValue) {
+  Future<void> addTitle(String userGeneratedValue) async {
     CollectionReference fireStore =
         FirebaseFirestore.instance.collection('collection');
 
-    return fireStore.add({'title': userGeneratedValue});
+    var generatedId = await fireStore
+        .add({'title': userGeneratedValue, 'id': '', 'isDone': false});
+
+    fireStore
+        .doc(generatedId.id)
+        .update({'title': userGeneratedValue, 'id': generatedId.id}).then(
+            (value) => print('added '));
   }
 }
 
 //stream list
-class StreamsLists extends StatefulWidget {
+class IncompletedListStreams extends StatefulWidget {
   @override
-  State<StreamsLists> createState() => _StreamsListsState();
+  State<IncompletedListStreams> createState() => _IncompletedListStreamsState();
 }
 
-class _StreamsListsState extends State<StreamsLists> {
+class _IncompletedListStreamsState extends State<IncompletedListStreams> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firebaseFirestore.collection('collection').snapshots(),
+      stream: _firebaseFirestore
+          .collection('collection')
+          .orderBy('id', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          List<dynamic> incompletedLists = [];
+          List<dynamic> completedLists = [];
+
+          var items = snapshot.data!.docs;
+          for (var item in items) {
+            if (item['isDone'] == false) {
+              incompletedLists.add(item);
+            } else {
+              completedLists.add(item);
+            }
+
+            // print(item['title']);
+          }
+
+          List<dynamic> finalLists = [...incompletedLists, ...completedLists];
+          for (var item in finalLists) {
+            print(item['isDone']);
+          }
+          // print(incompletedLists.length);
+
           return ListView.builder(
-            // itemCount: list.length,
-            itemCount: snapshot.data?.docs.length,
+            itemCount: finalLists.length,
             itemBuilder: (context, index) {
-              int len = snapshot.data!.docs.length;
-
+              final item = finalLists[index];
+              int len = finalLists.length;
               int fraction = 255 ~/ (len + 1);
-
               int val = (255 - (fraction * index));
-              if (val < 1) print(val);
-              String title = snapshot.data?.docs[index]['title'];
-              return Container(
-                color: Color.fromRGBO((val), 0, 0, 1),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(10),
-                  onLongPress: () async {
-                    print(snapshot.data?.docs[index]['title']);
-                    deleteTask(snapshot.data?.docs[index].id);
-                  },
-                  onTap: () {
-                    // Navigator.pushNamed(context, TaskList.id);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TaskList(
-                          parentId: (snapshot.data!.docs[index].id),
-                        ),
-                      ),
-                    );
-                  },
-                  title: Text(
-                    title,
-                    style: TextStyle(color: Colors.white, fontSize: 25),
-                  ),
-                ),
-              );
+              Color color = Color.fromRGBO((val), 0, 0, 1);
+              String title = item['title'];
+              if (item['isDone'] == false) {
+                return completedList(item, color, index, context, title);
+              } else {
+                return inCompletedList(item, color, index, context, title);
+              }
             },
           );
         }
         return CircularProgressIndicator();
       },
+    );
+  }
+
+  GestureDetector completedList(
+      item, Color color, int index, BuildContext context, String title) {
+    return GestureDetector(
+      child: Dismissible(
+        key: Key(item.id),
+        onDismissed: (direction) {
+          print(direction);
+          if (direction == DismissDirection.endToStart) {
+            deleteTask(item['id']);
+          } else {
+            setState(() {});
+          }
+        },
+        background: Container(
+          color: Colors.green,
+          child: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(left: 10),
+        ),
+        secondaryBackground: Container(
+          color: Colors.black,
+          alignment: Alignment.centerRight,
+          padding: EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
+        child: Container(
+          color: color,
+          key: Key(index.toString()),
+          child: ListTile(
+            dense: true,
+            selected: true,
+            contentPadding: EdgeInsets.all(10),
+            onLongPress: () {
+              deleteTask(item['id']);
+            },
+            onTap: () {
+              // Navigator.pushNamed(context, TaskList.id);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TaskList(
+                    parentId: (item.id),
+                  ),
+                ),
+              );
+            },
+            title: Text(
+              title,
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector inCompletedList(
+      item, Color color, int index, BuildContext context, String title) {
+    return GestureDetector(
+      child: Dismissible(
+        key: Key(item.id),
+        onDismissed: (direction) {
+          print(direction);
+          if (direction == DismissDirection.endToStart) {
+            deleteTask(item['id']);
+          } else {
+            setState(() {});
+          }
+        },
+        background: Container(
+          color: Colors.green,
+          child: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(left: 10),
+        ),
+        secondaryBackground: Container(
+          color: Colors.black,
+          alignment: Alignment.centerRight,
+          padding: EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
+        child: Container(
+          color: Colors.grey[900],
+          key: Key(index.toString()),
+          child: ListTile(
+            dense: true,
+            selected: true,
+            contentPadding: EdgeInsets.all(10),
+            onLongPress: () {
+              deleteTask(item['id']);
+            },
+            onTap: () {
+              // Navigator.pushNamed(context, TaskList.id);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TaskList(
+                    parentId: (item.id),
+                  ),
+                ),
+              );
+            },
+            title: Text(
+              title,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 25,
+                decoration: TextDecoration.lineThrough
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -119,4 +258,10 @@ class _StreamsListsState extends State<StreamsLists> {
         .then((value) => print('deleted'))
         .onError((error, stackTrace) => print(error));
   }
+}
+
+Widget completedList() {
+  return Container(
+    color: Colors.green,
+  );
 }

@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, unused_import
 
+import 'package:clear_to_do/screens/dismissable.dart';
 import 'package:clear_to_do/screens/main_screen/main_screen.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
 import 'package:clear_to_do/screens/sign_in_screen.dart';
@@ -34,7 +35,9 @@ class ClearToDo extends StatelessWidget {
       ),
       title: 'Clear To Do',
       initialRoute: MainScreenFirebase.id,
+      // initialRoute: Dissmisable.id,
       routes: {
+        Dissmisable.id :(context) => Dissmisable(),
         TaskList.id: (context) => TaskList(
               parentId: '',
             ),
