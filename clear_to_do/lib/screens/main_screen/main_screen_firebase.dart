@@ -39,7 +39,7 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
                 title: 'Create new item',
               ),
             ),
-            Expanded(flex: 8, child: IncompletedListStreams()),
+            Expanded(flex: 8, child: ListStreams()),
             Expanded(
                 child: Container(
               color: Colors.cyan,
@@ -65,12 +65,12 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
 }
 
 //stream list
-class IncompletedListStreams extends StatefulWidget {
+class ListStreams extends StatefulWidget {
   @override
-  State<IncompletedListStreams> createState() => _IncompletedListStreamsState();
+  State<ListStreams> createState() => _ListStreamsState();
 }
 
-class _IncompletedListStreamsState extends State<IncompletedListStreams> {
+class _ListStreamsState extends State<ListStreams> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   @override
@@ -111,11 +111,8 @@ class _IncompletedListStreamsState extends State<IncompletedListStreams> {
               int val = (255 - (fraction * index));
               Color color = Color.fromRGBO((val), 0, 0, 1);
               String title = item['title'];
-              if (item['isDone'] == false) {
-                return completedList(item, color, index, context, title);
-              } else {
-                return inCompletedList(item, color, index, context, title);
-              }
+              return listTile(
+                  item, color, index, context, title, item['isDone']);
             },
           );
         }
@@ -124,80 +121,33 @@ class _IncompletedListStreamsState extends State<IncompletedListStreams> {
     );
   }
 
-  GestureDetector completedList(
-      item, Color color, int index, BuildContext context, String title) {
+  GestureDetector listTile(item, Color color, int index, BuildContext context,
+      String title, bool isDone) {
     return GestureDetector(
       child: Dismissible(
-        key: Key(item.id),
-        onDismissed: (direction) {
-          print(direction);
-          if (direction == DismissDirection.endToStart) {
-            deleteTask(item['id']);
+          key: Key(item.id),
+        confirmDismiss: ((direction) async {
+          if(direction == DismissDirection.startToEnd) {
+            changeTaskStatus(item);
+            return false;
           } else {
-            setState(() {});
-          }
-        },
-        background: Container(
-          color: Colors.green,
-          child: Icon(
-            Icons.check,
-            color: Colors.white,
-          ),
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(left: 10),
-        ),
-        secondaryBackground: Container(
-          color: Colors.black,
-          alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: 10),
-          child: Icon(
-            Icons.delete,
-            color: Colors.white,
-          ),
-        ),
-        child: Container(
-          color: color,
-          key: Key(index.toString()),
-          child: ListTile(
-            dense: true,
-            selected: true,
-            contentPadding: EdgeInsets.all(10),
-            onLongPress: () {
               deleteTask(item['id']);
-            },
-            onTap: () {
-              // Navigator.pushNamed(context, TaskList.id);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => TaskList(
-                    parentId: (item.id),
-                  ),
-                ),
-              );
-            },
-            title: Text(
-              title,
-              style: TextStyle(color: Colors.white, fontSize: 25),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  GestureDetector inCompletedList(
-      item, Color color, int index, BuildContext context, String title) {
-    return GestureDetector(
-      child: Dismissible(
-        key: Key(item.id),
-        onDismissed: (direction) {
-          print(direction);
-          if (direction == DismissDirection.endToStart) {
-            deleteTask(item['id']);
-          } else {
-            setState(() {});
+              return  true;
           }
-        },
+          
+        }),
+        
+        // onDismissed: (direction) {
+        //   print(direction);
+        //   if (direction == DismissDirection.endToStart) {
+            
+        //   } else {
+        //     changeTaskStatus(item);
+        //     Future.delayed(Duration(seconds: 1), () {
+        //       setState(() {});
+        //     });
+        //   }
+        // },
         background: Container(
           color: Colors.green,
           child: Icon(
@@ -217,7 +167,7 @@ class _IncompletedListStreamsState extends State<IncompletedListStreams> {
           ),
         ),
         child: Container(
-          color: Colors.grey[900],
+          color: isDone ? Colors.grey[700] : color,
           key: Key(index.toString()),
           child: ListTile(
             dense: true,
@@ -239,10 +189,11 @@ class _IncompletedListStreamsState extends State<IncompletedListStreams> {
             title: Text(
               title,
               style: TextStyle(
-                color: Colors.grey,
-                fontSize: 25,
-                decoration: TextDecoration.lineThrough
-              ),
+                  color: Colors.white,
+                  fontSize: 25,
+                  decoration: isDone
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none),
             ),
           ),
         ),
@@ -258,10 +209,17 @@ class _IncompletedListStreamsState extends State<IncompletedListStreams> {
         .then((value) => print('deleted'))
         .onError((error, stackTrace) => print(error));
   }
-}
 
-Widget completedList() {
-  return Container(
-    color: Colors.green,
-  );
+  void changeTaskStatus(item) async {
+    bool status = true;
+    if (item['isDone']) {
+      status = false;
+    }
+    CollectionReference fireStore =
+        FirebaseFirestore.instance.collection('collection');
+
+    return await fireStore
+        .doc(item.id)
+        .update({'isDone': status}).then((value) => print('updated'));
+  }
 }
