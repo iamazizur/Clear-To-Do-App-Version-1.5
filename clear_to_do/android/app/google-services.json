@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "464437302704",
+    "project_id": "clear-to-do-app",
+    "storage_bucket": "clear-to-do-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464437302704:android:d05ff75dae32245d89b275",
+        "android_client_info": {
+          "package_name": "com.example.clear_to_do"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464437302704-24i0i8sgqebedg1kesbq4iptb6gkg20s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8PBOFMdSWQnbEb8Zl9UvXBA6Y3FqW9_s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464437302704-24i0i8sgqebedg1kesbq4iptb6gkg20s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
