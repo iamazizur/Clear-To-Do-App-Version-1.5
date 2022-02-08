@@ -17,34 +17,45 @@ class MainScreenFirebase extends StatefulWidget {
   _MainScreenFirebaseState createState() => _MainScreenFirebaseState();
 }
 
-FirebaseFirestore _tasks = FirebaseFirestore.instance;
-
 class _MainScreenFirebaseState extends State<MainScreenFirebase> {
+  bool isVisible = false;
   @override
   Widget build(BuildContext context) {
     var color = Colors.black;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: AddListWidget(
-                buttonFunction: () {
-                  print('button clicked');
-                  print(userGeneratedValue);
-                  addTitle(userGeneratedValue);
-                },
-                title: 'Create new item',
+        child: RefreshIndicator(
+          onRefresh: () async {
+            print('refreshing working on page');
+            setState(() {
+              isVisible = (isVisible) ? false : true;
+            });
+          },
+          child: Column(
+            children: [
+              Visibility(
+                visible: isVisible,
+                child: Expanded(
+                  flex: 1,
+                  child: AddListWidget(
+                    buttonFunction: () async {
+                      await addTitle(userGeneratedValue).then((value) {
+                        setState(() {
+                          isVisible = (isVisible) ? false : true;
+                        });
+                      });
+                    },
+                    title: 'Create new item',
+                  ),
+                ),
               ),
-            ),
-            Expanded(flex: 8, child: ListStreams()),
-            Expanded(
-                child: Container(
-              color: Colors.cyan,
-            )),
-          ],
+              Expanded(
+                flex: 8,
+                child: ListStreams(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -78,7 +89,7 @@ class _ListStreamsState extends State<ListStreams> {
     return StreamBuilder<QuerySnapshot>(
       stream: _firebaseFirestore
           .collection('collection')
-          .orderBy('id', descending: true)
+          .orderBy('id', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -102,7 +113,10 @@ class _ListStreamsState extends State<ListStreams> {
           }
           // print(incompletedLists.length);
 
-          return ListView.builder(
+          return ReorderableListView.builder(
+            onReorder: ((oldIndex, newIndex) => setState(() {
+                  print('set state changed');
+                })),
             itemCount: finalLists.length,
             itemBuilder: (context, index) {
               final item = finalLists[index];
@@ -111,6 +125,7 @@ class _ListStreamsState extends State<ListStreams> {
               int val = (255 - (fraction * index));
               Color color = Color.fromRGBO((val), 0, 0, 1);
               String title = item['title'];
+              print('item id: ${item.id.runtimeType}');
               return listTile(
                   item, color, index, context, title, item['isDone']);
             },
@@ -121,80 +136,61 @@ class _ListStreamsState extends State<ListStreams> {
     );
   }
 
-  GestureDetector listTile(item, Color color, int index, BuildContext context,
+  Widget listTile(item, Color color, int index, BuildContext context,
       String title, bool isDone) {
-    return GestureDetector(
-      child: Dismissible(
-          key: Key(item.id),
-        confirmDismiss: ((direction) async {
-          if(direction == DismissDirection.startToEnd) {
-            changeTaskStatus(item);
-            return false;
-          } else {
-              deleteTask(item['id']);
-              return  true;
-          }
-          
-        }),
-        
-        // onDismissed: (direction) {
-        //   print(direction);
-        //   if (direction == DismissDirection.endToStart) {
-            
-        //   } else {
-        //     changeTaskStatus(item);
-        //     Future.delayed(Duration(seconds: 1), () {
-        //       setState(() {});
-        //     });
-        //   }
-        // },
-        background: Container(
-          color: Colors.green,
-          child: Icon(
-            Icons.check,
-            color: Colors.white,
-          ),
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(left: 10),
+    return Dismissible(
+      key: ValueKey(item.id),
+      confirmDismiss: ((direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          changeTaskStatus(item);
+          return false;
+        } else {
+          deleteTask(item['id']);
+          return true;
+        }
+      }),
+      background: Container(
+        color: Colors.green,
+        child: Icon(
+          Icons.check,
+          color: Colors.white,
         ),
-        secondaryBackground: Container(
-          color: Colors.black,
-          alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: 10),
-          child: Icon(
-            Icons.delete,
-            color: Colors.white,
-          ),
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: 10),
+      ),
+      secondaryBackground: Container(
+        color: Colors.black,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 10),
+        child: Icon(
+          Icons.delete,
+          color: Colors.white,
         ),
-        child: Container(
-          color: isDone ? Colors.grey[700] : color,
-          key: Key(index.toString()),
-          child: ListTile(
-            dense: true,
-            selected: true,
-            contentPadding: EdgeInsets.all(10),
-            onLongPress: () {
-              deleteTask(item['id']);
-            },
-            onTap: () {
-              // Navigator.pushNamed(context, TaskList.id);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => TaskList(
-                    parentId: (item.id),
-                  ),
+      ),
+      child: Container(
+        color: isDone ? Colors.grey[700] : color,
+        // key: Key(index.toString()),
+        child: ListTile(
+          dense: true,
+          selected: true,
+          contentPadding: EdgeInsets.all(10),
+          onTap: () {
+            // Navigator.pushNamed(context, TaskList.id);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TaskList(
+                  parentId: (item.id),
                 ),
-              );
-            },
-            title: Text(
-              title,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  decoration: isDone
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none),
-            ),
+              ),
+            );
+          },
+          title: Text(
+            title,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                decoration:
+                    isDone ? TextDecoration.lineThrough : TextDecoration.none),
           ),
         ),
       ),
