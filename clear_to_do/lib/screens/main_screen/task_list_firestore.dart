@@ -3,6 +3,7 @@ import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/model/models.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,13 +28,6 @@ class _TaskListState extends State<TaskList> {
   String parentId;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    print(parentId);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -43,8 +37,17 @@ class _TaskListState extends State<TaskList> {
             Expanded(
                 flex: 1,
                 child: AddListWidget(
-                  buttonFunction: () {
-                    addTaskList(userGeneratedValue);
+                  buttonFunction: () async {
+                    FirestoreFunctions(
+                        collectionReference: FirebaseFirestore.instance
+                            .collection('collection')
+                            .doc(parentId)
+                            .collection('tasks'),
+                        map: {
+                          'id': '',
+                          'task': userGeneratedValue,
+                          'isDone': false
+                        }).addItem();
                   },
                   title: 'Create tasks',
                 )),
@@ -57,23 +60,21 @@ class _TaskListState extends State<TaskList> {
       ),
     );
   }
+  /*
+    Unused
+            Future<void> addTaskList(String userGeneratedValue) async {
+              CollectionReference firestore =
+                  FirebaseFirestore.instance.collection('collection');
 
-  Future<void> addTaskList(String userGeneratedValue) async {
-    CollectionReference firestore =
-        FirebaseFirestore.instance.collection('collection');
+              var generatedId = await firestore
+                  .doc(parentId)
+                  .collection('tasks')
+                  .add({'task': userGeneratedValue, 'id': '', 'isDone': false});
 
-    var generatedId = await firestore
-        .doc(parentId)
-        .collection('tasks')
-        .add({'task': userGeneratedValue, 'id': ''});
-
-    firestore
-        .doc(parentId)
-        .collection('tasks')
-        .doc(generatedId.id)
-        .update({'task': userGeneratedValue, 'id': generatedId.id}).then(
-            (value) => print('successfully add taks'));
-  }
+              firestore.doc(parentId).collection('tasks').doc(generatedId.id).update(
+                  {'id': generatedId.id}).then((value) => print('successfully add taks'));
+            }
+  */
 }
 
 class TasklListStreams extends StatefulWidget {
@@ -101,7 +102,17 @@ class _TasklListStreamsState extends State<TasklListStreams> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print(snapshot.data?.docs.length);
+          List<dynamic> incompletedLists = [];
+          List<dynamic> completedLists = [];
+          var items = snapshot.data!.docs;
+          // for (var item in items) {
+          //   if (item['isDone'] == false) {
+          //     incompletedLists.add(item);
+          //   } else {
+          //     completedLists.add(item);
+          //   }
+          // }
+          List<dynamic> finalLists = [...incompletedLists, ...completedLists];
 
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,

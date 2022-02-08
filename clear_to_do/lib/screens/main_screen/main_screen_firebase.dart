@@ -3,6 +3,7 @@ import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/model/models.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,6 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            print('refreshing working on page');
             setState(() {
               isVisible = (isVisible) ? false : true;
             });
@@ -40,11 +40,20 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
                   flex: 1,
                   child: AddListWidget(
                     buttonFunction: () async {
-                      await addTitle(userGeneratedValue).then((value) {
-                        setState(() {
-                          isVisible = (isVisible) ? false : true;
-                        });
-                      });
+                      FirestoreFunctions(
+                          collectionReference: FirebaseFirestore.instance
+                              .collection('collection'),
+                          map: {
+                            'id': '',
+                            'title': userGeneratedValue,
+                            'isDone': false
+                          }).addItem();
+
+                      // await addTitle(userGeneratedValue).then((value) {
+                      //   setState(() {
+                      //     isVisible = (isVisible) ? false : true;
+                      //   });
+                      // });
                     },
                     title: 'Create new item',
                   ),
@@ -60,19 +69,20 @@ class _MainScreenFirebaseState extends State<MainScreenFirebase> {
       ),
     );
   }
+  /*
+      Unused
+          Future<void> addTitle(String userGeneratedValue) async {
+            CollectionReference fireStore =
+                FirebaseFirestore.instance.collection('collection');
 
-  Future<void> addTitle(String userGeneratedValue) async {
-    CollectionReference fireStore =
-        FirebaseFirestore.instance.collection('collection');
+            var generatedId = await fireStore
+                .add({'title': userGeneratedValue, 'id': '', 'isDone': false});
 
-    var generatedId = await fireStore
-        .add({'title': userGeneratedValue, 'id': '', 'isDone': false});
-
-    fireStore
-        .doc(generatedId.id)
-        .update({'title': userGeneratedValue, 'id': generatedId.id}).then(
-            (value) => print('added '));
-  }
+            fireStore
+                .doc(generatedId.id)
+                .update({'id': generatedId.id}).then((value) => print('added '));
+          }
+  */
 }
 
 //stream list
@@ -103,15 +113,9 @@ class _ListStreamsState extends State<ListStreams> {
             } else {
               completedLists.add(item);
             }
-
-            // print(item['title']);
           }
 
           List<dynamic> finalLists = [...incompletedLists, ...completedLists];
-          for (var item in finalLists) {
-            print(item['isDone']);
-          }
-          // print(incompletedLists.length);
 
           return ReorderableListView.builder(
             onReorder: ((oldIndex, newIndex) => setState(() {
@@ -197,6 +201,7 @@ class _ListStreamsState extends State<ListStreams> {
     );
   }
 
+  //functions
   Future<void> deleteTask(doc) async {
     return _firebaseFirestore
         .collection('collection')
