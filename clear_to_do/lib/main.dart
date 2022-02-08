@@ -4,6 +4,7 @@ import 'package:clear_to_do/check.dart';
 import 'package:clear_to_do/screens/dismissable.dart';
 import 'package:clear_to_do/screens/main_screen/main_screen.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
+import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
 import 'package:clear_to_do/screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/main_screen/main_screen_firebase.dart';
@@ -35,9 +36,10 @@ class ClearToDo extends StatelessWidget {
         textTheme: GoogleFonts.quicksandTextTheme(Theme.of(context).textTheme),
       ),
       title: 'Clear To Do',
-      initialRoute: MainScreenFirebase.id,
+      initialRoute: NewMainScreenFirebase.id,
       // initialRoute: TaskList.id,
       routes: {
+        NewMainScreenFirebase.id :(context) => NewMainScreenFirebase(),
         Check.id: ((context) => Check()),
         Dissmisable.id: (context) => Dissmisable(),
         TaskList.id: (context) => TaskList(

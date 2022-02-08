@@ -36,22 +36,23 @@ class _TaskListState extends State<TaskList> {
         child: Column(
           children: [
             Expanded(
-                flex: 1,
-                child: AddListWidget(
-                  buttonFunction: () async {
-                    FirestoreFunctions(
-                        collectionReference: FirebaseFirestore.instance
-                            .collection('collection')
-                            .doc(parentId)
-                            .collection('tasks'),
-                        map: {
-                          'id': '',
-                          'task': userGeneratedValue,
-                          'isDone': false
-                        }).addItem();
-                  },
-                  title: 'Create tasks',
-                )),
+              flex: 1,
+              child: AddListWidget(
+                buttonFunction: () async {
+                  FirestoreFunctions(
+                      collectionReference: FirebaseFirestore.instance
+                          .collection('collection')
+                          .doc(parentId)
+                          .collection('tasks'),
+                      map: {
+                        'id': '',
+                        'task': userGeneratedValue,
+                        'isDone': false
+                      }).addItem();
+                },
+                title: 'Create tasks',
+              ),
+            ),
             Expanded(
               flex: 8,
               child: TasklListStreams(id: parentId),

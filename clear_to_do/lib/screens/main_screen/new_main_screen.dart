@@ -13,14 +13,14 @@ import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class MainScreenFirebase extends StatefulWidget {
-  static const String id = 'mainScreenFirebaseFirebase';
+class NewMainScreenFirebase extends StatefulWidget {
+  static const String id = 'NewMainScreenFirebaseFirebase';
 
   @override
-  _MainScreenFirebaseState createState() => _MainScreenFirebaseState();
+  _NewMainScreenFirebaseState createState() => _NewMainScreenFirebaseState();
 }
 
-class _MainScreenFirebaseState extends State<MainScreenFirebase> {
+class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
   bool isVisible = false;
   @override
   Widget build(BuildContext context) {
