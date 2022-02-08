@@ -83,6 +83,9 @@ class _NewTaskListState extends State<NewTaskList> {
                 child: ListStreams(
                   collectionReference: collectionReference,
                   parentId: parentId,
+                  firestoreFunctions: firestoreFunctions,
+                  mainScreen: false,
+                  ontap: (){},
                 ),
               ),
             ],

@@ -2,6 +2,8 @@
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/screens/dismissable.dart';
+import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
+import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -71,30 +73,38 @@ class FirestoreFunctions {
   }
 }
 
-
-
-
 //liststreams class
-
 
 class ListStreams extends StatefulWidget {
   var parentId;
-  CollectionReference<Map<String, dynamic>> collectionReference;
+  final bool mainScreen;
 
-  ListStreams({this.parentId, required this.collectionReference});
+  CollectionReference<Map<String, dynamic>> collectionReference;
+  FirestoreFunctions firestoreFunctions;
+  Function ontap;
+  ListStreams(
+      {this.parentId,
+      required this.collectionReference,
+      required this.firestoreFunctions,
+      required this.ontap,
+      required this.mainScreen});
   @override
   State<ListStreams> createState() =>
-      _ListStreamsState(parentId, collectionReference);
+      _ListStreamsState(parentId, collectionReference, mainScreen);
 }
 
 class _ListStreamsState extends State<ListStreams> {
   final String parentId;
+  final bool mainScreen;
+
   final CollectionReference<Map<String, dynamic>> collectionReference;
 
-  _ListStreamsState(this.parentId, this.collectionReference);
+  _ListStreamsState(this.parentId, this.collectionReference, this.mainScreen);
 
   @override
   Widget build(BuildContext context) {
+    //onTap function
+
     //snapshot
     Stream<QuerySnapshot<Map<String, dynamic>>> snapshot =
         collectionReference.snapshots();
@@ -128,7 +138,7 @@ class _ListStreamsState extends State<ListStreams> {
               return listTile(item, color, index, context, title,
                   item['isDone'], firestoreFunctions, () {
                 print('azizur rahman');
-              });
+              }, mainScreen);
             },
           );
         }
@@ -145,7 +155,8 @@ class _ListStreamsState extends State<ListStreams> {
       String title,
       bool isDone,
       FirestoreFunctions firestoreFunctions,
-      Function ontap) {
+      Function ontap,
+      bool mainScreen) {
     return Dismissible(
       key: ValueKey(item.id),
       confirmDismiss: ((direction) async {
@@ -158,7 +169,17 @@ class _ListStreamsState extends State<ListStreams> {
         child: ListTile(
           contentPadding: EdgeInsets.all(10),
           onTap: () {
-            ontap();
+            if (mainScreen) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TaskList(
+                    parentId: (item.id),
+                  ),
+                ),
+              );
+            } else {
+              return;
+            }
           },
           title: Text(
             title,
@@ -172,6 +193,4 @@ class _ListStreamsState extends State<ListStreams> {
       ),
     );
   }
-
-  
 }
