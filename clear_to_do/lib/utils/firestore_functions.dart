@@ -22,4 +22,20 @@ class FirestoreFunctions {
         .doc(generatedId.id)
         .update({'id': generatedId.id}).then((value) => print('SUCCESS!'));
   }
+
+  Future<void> deleteItem(String id) async {
+    collectionReference
+        .doc(id)
+        .delete()
+        .then((value) => print('Successfully Deleted'))
+        .onError((error, stackTrace) => print(error));
+  }
+
+  Future<void> changeTaskStatus(dynamic item) async {
+    bool status = (item['isDone']) ? false : true;
+    collectionReference
+        .doc(item.id)
+        .update({'isDone': status}).then((value) => print('updated'));
+  }
+  
 }

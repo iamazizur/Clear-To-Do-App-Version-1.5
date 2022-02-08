@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, no_logic_in_create_state, todo, recursive_getters, override_on_non_overriding_member
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
-import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
 import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
 import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,79 +12,124 @@ import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class MainScreenFirebase extends StatefulWidget {
-  static const String id = 'mainScreenFirebaseFirebase';
+class NewTaskList extends StatefulWidget {
+  static const String id = 'NewTaskList';
+  final String parentId;
+
+  const NewTaskList({Key? key, required this.parentId}) : super(key: key);
 
   @override
-  _MainScreenFirebaseState createState() => _MainScreenFirebaseState();
+  _NewTaskListState createState() => _NewTaskListState(parentId);
 }
 
-class _MainScreenFirebaseState extends State<MainScreenFirebase> {
-  bool isVisible = false;
+class _NewTaskListState extends State<NewTaskList> {
+  _NewTaskListState(this.parentId);
+  String parentId;
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> snapshot =
+      FirebaseFirestore.instance.collection('collection').snapshots();
+
   @override
   Widget build(BuildContext context) {
-    var color = Colors.black;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              isVisible = (isVisible) ? false : true;
-            });
-          },
-          child: Column(
-            children: [
-              Visibility(
-                visible: isVisible,
-                child: Expanded(
-                  flex: 1,
-                  child: AddListWidget(
-                    buttonFunction: () async {
-                      FirestoreFunctions(
-                          collectionReference: FirebaseFirestore.instance
-                              .collection('collection'),
-                          map: {
-                            'id': '',
-                            'title': userGeneratedValue,
-                            'isDone': false
-                          }).addItem().then((value) {
-                        setState(() {
-                          isVisible = (isVisible) ? false : true;
-                        });
-                      });
-                    },
-                    title: 'Create new item',
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 8,
-                child: ListStreams(),
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            Expanded(
+                flex: 1,
+                child: AddListWidget(
+                  buttonFunction: () async {
+                    FirestoreFunctions(
+                        collectionReference: FirebaseFirestore.instance
+                            .collection('collection')
+                            .doc(parentId)
+                            .collection('tasks'),
+                        map: {
+                          'id': '',
+                          'task': userGeneratedValue,
+                          'isDone': false
+                        }).addItem();
+                  },
+                  title: 'Create tasks',
+                )),
+            Expanded(
+              flex: 8,
+              child: TasklListStreams(id: parentId),
+            )
+          ],
         ),
       ),
     );
   }
-  /*
-      Unused
-          Future<void> addTitle(String userGeneratedValue) async {
-            CollectionReference fireStore =
-                FirebaseFirestore.instance.collection('collection');
-
-            var generatedId = await fireStore
-                .add({'title': userGeneratedValue, 'id': '', 'isDone': false});
-
-            fireStore
-                .doc(generatedId.id)
-                .update({'id': generatedId.id}).then((value) => print('added '));
-          }
-  */
 }
 
-//stream list
+class TasklListStreams extends StatefulWidget {
+  TasklListStreams({
+    Key? key,
+    required this.id,
+  }) : super(key: key);
+
+  final String id;
+
+  @override
+  State<TasklListStreams> createState() => _TasklListStreamsState();
+}
+
+class _TasklListStreamsState extends State<TasklListStreams> {
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firebaseFirestore
+          .collection('collection')
+          .doc(widget.id)
+          .collection('tasks')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<dynamic> incompletedLists = [];
+          List<dynamic> completedLists = [];
+          var items = snapshot.data!.docs;
+          for (var item in items) {
+            if (item['isDone'] == false) {
+              incompletedLists.add(item);
+            } else {
+              completedLists.add(item);
+            }
+          }
+          List<dynamic> finalLists = [...incompletedLists, ...completedLists];
+
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              int val = (255 - (index * 30));
+              if (val <= 0) val = 0;
+              String title = snapshot.data?.docs[index]['task'];
+              return Container(
+                color: Color.fromRGBO(0, 0, (val), 1),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(10),
+                  title: Text(
+                    snapshot.data!.docs[index]['task'],
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+}
+
+
 class ListStreams extends StatefulWidget {
   @override
   State<ListStreams> createState() => _ListStreamsState();

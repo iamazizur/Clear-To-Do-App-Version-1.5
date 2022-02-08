@@ -23,8 +23,9 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   _TaskListState(this.parentId);
+  Stream<QuerySnapshot<Map<String, dynamic>>> snapshot =
+      FirebaseFirestore.instance.collection('collection').snapshots();
 
-  // Object? get parentId => parentId;
   String parentId;
 
   @override
@@ -60,21 +61,6 @@ class _TaskListState extends State<TaskList> {
       ),
     );
   }
-  /*
-    Unused
-            Future<void> addTaskList(String userGeneratedValue) async {
-              CollectionReference firestore =
-                  FirebaseFirestore.instance.collection('collection');
-
-              var generatedId = await firestore
-                  .doc(parentId)
-                  .collection('tasks')
-                  .add({'task': userGeneratedValue, 'id': '', 'isDone': false});
-
-              firestore.doc(parentId).collection('tasks').doc(generatedId.id).update(
-                  {'id': generatedId.id}).then((value) => print('successfully add taks'));
-            }
-  */
 }
 
 class TasklListStreams extends StatefulWidget {
@@ -105,13 +91,13 @@ class _TasklListStreamsState extends State<TasklListStreams> {
           List<dynamic> incompletedLists = [];
           List<dynamic> completedLists = [];
           var items = snapshot.data!.docs;
-          // for (var item in items) {
-          //   if (item['isDone'] == false) {
-          //     incompletedLists.add(item);
-          //   } else {
-          //     completedLists.add(item);
-          //   }
-          // }
+          for (var item in items) {
+            if (item['isDone'] == false) {
+              incompletedLists.add(item);
+            } else {
+              completedLists.add(item);
+            }
+          }
           List<dynamic> finalLists = [...incompletedLists, ...completedLists];
 
           return ListView.builder(
