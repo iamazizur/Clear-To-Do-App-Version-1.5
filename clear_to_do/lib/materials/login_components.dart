@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import
 import 'package:clear_to_do/screens/main_screen/main_screen.dart';
+import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:clear_to_do/materials/login_components.dart';
@@ -22,7 +23,7 @@ class LoginComponent extends StatelessWidget {
             textStyle: TextStyle(fontSize: 20),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, MainScreen.id);
+            Navigator.pushNamed(context, NewMainScreenFirebase.id);
           },
           child: Text('Get Started'),
         ),

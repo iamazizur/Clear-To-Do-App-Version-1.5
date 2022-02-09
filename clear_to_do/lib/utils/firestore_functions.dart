@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace, non_constant_identifier_names, no_logic_in_create_state
+// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace, non_constant_identifier_names, no_logic_in_create_state, curly_braces_in_flow_control_structures
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/screens/dismissable.dart';
@@ -6,6 +6,7 @@ import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
 import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:marquee/marquee.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/cupertino.dart';
@@ -77,6 +78,23 @@ class FirestoreFunctions {
     collectionReference.doc(item.id).update({'title': updatedValue}).then(
         (value) => print('User Value changed'));
   }
+
+  void swapTasks(dynamic oldTask, dynamic newTask) {
+    if (oldTask['isDone'] == true || newTask['isDone'] == true)
+      return;
+    else {
+      String oldTitle = oldTask['title'];
+      String newTitle = newTask['title'];
+      String tempTitle = oldTask['title'];
+
+      collectionReference
+          .doc(oldTask.id)
+          .update({'title': newTitle}).then((value) => print(newTitle));
+      collectionReference
+          .doc(newTask.id)
+          .update({'title': tempTitle}).then((value) => print(tempTitle));
+    }
+  }
 }
 
 //liststreams class
@@ -131,9 +149,20 @@ class _ListStreamsState extends State<ListStreams> {
           List<dynamic> finalLists = firestoreFunctions.generateList(items);
 
           return ReorderableListView.builder(
-            onReorder: ((oldIndex, newIndex) => setState(() {
-                  print('set state changed');
-                })),
+            dragStartBehavior: DragStartBehavior.start,
+            onReorder: ((oldIndex, newIndex) async {
+              final finalIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
+              // if (newIndex >= finalLists.length)
+              //   newIndex = finalLists.length - 1;
+              // if (newIndex == oldIndex + 1) newIndex--;
+
+              // if (newIndex < 0) newIndex = 0;
+              print('oldIndex : $oldIndex');
+              print('newIndex : $finalIndex');
+
+              firestoreFunctions.swapTasks(
+                  finalLists[oldIndex], finalLists[finalIndex]);
+            }),
             itemCount: finalLists.length,
             itemBuilder: (context, index) {
               final item = finalLists[index];
@@ -223,7 +252,44 @@ class _ListStreamsState extends State<ListStreams> {
                 // color: Colors.green,
                 width: MediaQuery.of(context).size.width * 0.5,
                 height: MediaQuery.of(context).size.width * 0.1,
-                child: Marquee(
+                child: (title.length < 15)
+                    ? Text(
+                        title,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none),
+                      )
+                    : Marquee(
+                        showFadingOnlyWhenScrolling: true,
+                        startAfter: Duration(seconds: 5),
+                        pauseAfterRound: Duration(seconds: 5),
+                        fadingEdgeEndFraction: 0.3,
+                        blankSpace: 100,
+                        velocity: 50,
+                        text: title,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
+
+                /*
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      decoration: isDone
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none),
+                ),
+                */
+                /*
+                Marquee(
                     showFadingOnlyWhenScrolling: true,
                     startAfter: Duration(seconds: 5),
                     pauseAfterRound: Duration(seconds: 2),
@@ -237,6 +303,7 @@ class _ListStreamsState extends State<ListStreams> {
                         decoration: isDone
                             ? TextDecoration.lineThrough
                             : TextDecoration.none)),
+              */
               ),
               Icon(
                 Icons.drag_indicator_sharp,

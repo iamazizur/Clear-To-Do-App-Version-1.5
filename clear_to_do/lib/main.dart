@@ -36,10 +36,10 @@ class ClearToDo extends StatelessWidget {
         textTheme: GoogleFonts.quicksandTextTheme(Theme.of(context).textTheme),
       ),
       title: 'Clear To Do',
-      initialRoute: NewMainScreenFirebase.id,
+      initialRoute: MainScreenFirebase.id,
       // initialRoute: TaskList.id,
       routes: {
-        NewMainScreenFirebase.id :(context) => NewMainScreenFirebase(),
+        NewMainScreenFirebase.id: (context) => NewMainScreenFirebase(),
         Check.id: ((context) => Check()),
         Dissmisable.id: (context) => Dissmisable(),
         TaskList.id: (context) => TaskList(
