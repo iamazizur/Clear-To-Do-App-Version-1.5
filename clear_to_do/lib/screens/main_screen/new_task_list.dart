@@ -23,7 +23,7 @@ class NewTaskList extends StatefulWidget {
 class _NewTaskListState extends State<NewTaskList> {
   String parentId;
   _NewTaskListState(this.parentId);
-  bool isVisible = true;
+  bool _isVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +52,13 @@ class _NewTaskListState extends State<NewTaskList> {
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              isVisible = (isVisible) ? false : true;
+              _isVisible = (_isVisible) ? false : true;
             });
           },
           child: Column(
             children: [
               Visibility(
-                visible: isVisible,
+                visible: _isVisible,
                 child: Expanded(
                   flex: 1,
                   child: AddListWidget(
@@ -69,23 +69,24 @@ class _NewTaskListState extends State<NewTaskList> {
                             'id': '',
                             'title': userGeneratedValue,
                             'isDone': false
-                          }).addItem().then(
-                          (value) => isVisible = (isVisible) ? false : true);
+                          }).addItem().then((value) {
+                        setState(() {
+                          _isVisible = (_isVisible) ? false : true;
+                        });
+                      });
                     },
                     title: 'Create new item',
                   ),
                 ),
               ),
-              Text('data'),
               Expanded(
                 flex: 8,
-                // child: ListStreams(),
                 child: ListStreams(
                   collectionReference: collectionReference,
                   parentId: parentId,
                   firestoreFunctions: firestoreFunctions,
                   mainScreen: false,
-                  ontap: (){},
+                  ontap: () {},
                 ),
               ),
             ],
@@ -95,4 +96,3 @@ class _NewTaskListState extends State<NewTaskList> {
     );
   }
 }
-

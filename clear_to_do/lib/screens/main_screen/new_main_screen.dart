@@ -72,9 +72,7 @@ class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
                   parentId: '',
                   firestoreFunctions: firestoreFunctions,
                   mainScreen: true,
-                  ontap: () {
-                    
-                  },
+                  ontap: () {},
                 ),
               ),
             ],

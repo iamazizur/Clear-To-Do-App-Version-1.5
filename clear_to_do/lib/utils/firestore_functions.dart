@@ -8,8 +8,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class FirestoreFunctions {
   static FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
@@ -71,6 +72,11 @@ class FirestoreFunctions {
       return true;
     }
   }
+
+  Future<void> updateUserValue(dynamic item, String updatedValue) async {
+    collectionReference.doc(item.id).update({'title': updatedValue}).then(
+        (value) => print('User Value changed'));
+  }
 }
 
 //liststreams class
@@ -90,16 +96,18 @@ class ListStreams extends StatefulWidget {
       required this.mainScreen});
   @override
   State<ListStreams> createState() =>
-      _ListStreamsState(parentId, collectionReference, mainScreen);
+      _ListStreamsState(parentId, collectionReference, mainScreen, ontap);
 }
 
 class _ListStreamsState extends State<ListStreams> {
   final String parentId;
   final bool mainScreen;
+  final Function ontap;
 
   final CollectionReference<Map<String, dynamic>> collectionReference;
 
-  _ListStreamsState(this.parentId, this.collectionReference, this.mainScreen);
+  _ListStreamsState(
+      this.parentId, this.collectionReference, this.mainScreen, this.ontap);
 
   @override
   Widget build(BuildContext context) {
@@ -132,13 +140,13 @@ class _ListStreamsState extends State<ListStreams> {
               int len = finalLists.length;
               int fraction = 255 ~/ (len);
               int val = (255 - (fraction * index));
-              Color color = Color.fromRGBO((val), 0, 0, 1);
+              Color colorRed = Color.fromRGBO((val), 0, 0, 1);
+              Color colorBlue = Color.fromRGBO(0, 0, (val), 1);
+              Color color = mainScreen ? colorRed : colorBlue;
               String title = item['title'];
 
               return listTile(item, color, index, context, title,
-                  item['isDone'], firestoreFunctions, () {
-                print('azizur rahman');
-              }, mainScreen);
+                  item['isDone'], firestoreFunctions, () {}, mainScreen);
             },
           );
         }
@@ -157,22 +165,68 @@ class _ListStreamsState extends State<ListStreams> {
       FirestoreFunctions firestoreFunctions,
       Function ontap,
       bool mainScreen) {
-    return Dismissible(
+    TextEditingController textEditingController = TextEditingController();
+    textEditingController.text = title;
+
+    bool editIcon = false;
+    return Slidable(
+      startActionPane: ActionPane(motion: ScrollMotion(), children: [
+        SlidableAction(
+          onPressed: (context) => firestoreFunctions.changeTaskStatus(item),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          icon: Icons.check,
+          label: 'Done',
+        ),
+        SlidableAction(
+          onPressed: null,
+          backgroundColor: Colors.blue.shade900,
+          foregroundColor: Colors.white,
+          icon: Icons.edit,
+          label: 'Edit',
+        ),
+      ]),
+      endActionPane: ActionPane(motion: ScrollMotion(), children: [
+        SlidableAction(
+          onPressed: (context) async =>
+              await firestoreFunctions.deleteItem(item.id),
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          icon: Icons.delete,
+          label: 'Delete',
+        ),
+      ]),
       key: ValueKey(item.id),
-      confirmDismiss: ((direction) async {
-        return firestoreFunctions.dismissable(direction, item);
-      }),
-      background: DeleteOrCheck.checkContainer,
-      secondaryBackground: DeleteOrCheck.deleteContainer,
       child: Container(
+        padding: EdgeInsets.all(20),
         color: isDone ? Colors.grey[700] : color,
-        child: ListTile(
+        alignment: Alignment.topCenter,
+        child: Row(
+          
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              color: Colors.yellow,
+              width: 100,
+              child: Text(title),
+              // height: 100,
+            ),
+            Icon(
+              Icons.drag_indicator_sharp,
+              color: Colors.white,
+            ),
+          ],
+        ),
+        /*
+        ListTile(
+          horizontalTitleGap: 30,
           contentPadding: EdgeInsets.all(10),
+          leading: Icon(Icons.edgesensor_high),
           onTap: () {
             if (mainScreen) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => TaskList(
+                  builder: (context) => NewTaskList(
                     parentId: (item.id),
                   ),
                 ),
@@ -181,16 +235,102 @@ class _ListStreamsState extends State<ListStreams> {
               return;
             }
           },
-          title: Text(
-            title,
+          trailing: Icon(
+            Icons.drag_indicator_sharp,
+            color: Colors.white,
+          ),
+          title: EditableText(
+            paintCursorAboveText: true,
+            showCursor: true,
+            onSubmitted: (value) =>
+                firestoreFunctions.updateUserValue(item, value),
+            controller: textEditingController,
+            focusNode: FocusNode(),
+            cursorColor: Colors.yellow,
+            backgroundCursorColor: Colors.green,
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 25,
-                decoration:
-                    isDone ? TextDecoration.lineThrough : TextDecoration.none),
+                decoration: isDone
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none),
+            autofocus: false,
           ),
         ),
+        */
       ),
     );
   }
+
+  // Widget listTile(
+  //     dynamic item,
+  //     Color color,
+  //     int index,
+  //     BuildContext context,
+  //     String title,
+  //     bool isDone,
+  //     FirestoreFunctions firestoreFunctions,
+  //     Function ontap,
+  //     bool mainScreen) {
+  //   bool editIcon = false;
+  //   return Dismissible(
+  //     key: ValueKey(item.id),
+  //     confirmDismiss: ((direction) async {
+  //       return firestoreFunctions.dismissable(direction, item);
+  //     }),
+  //     background: DeleteOrCheck.checkContainer,
+  //     secondaryBackground: DeleteOrCheck.deleteContainer,
+  //     child: Container(
+  //       color: isDone ? Colors.grey[700] : color,
+  //       alignment: Alignment.topCenter,
+  //       child: ListTile(
+  //           contentPadding: mainScreen ? EdgeInsets.all(10) : null,
+  //           onTap: () {
+  //             if (mainScreen) {
+  //               Navigator.of(context).push(
+  //                 MaterialPageRoute(
+  //                   builder: (context) => NewTaskList(
+  //                     parentId: (item.id),
+  //                   ),
+  //                 ),
+  //               );
+  //             } else {
+  //               return;
+  //             }
+  //           },
+  //           trailing: mainScreen
+  //               ? null
+  //               : Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Icon(
+  //                       Icons.drag_indicator_sharp,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ],
+  //                 ),
+  //           title: mainScreen
+  //               ? Text(
+  //                   title,
+  //                   style: TextStyle(
+  //                       color: Colors.white,
+  //                       fontSize: 25,
+  //                       decoration: isDone
+  //                           ? TextDecoration.lineThrough
+  //                           : TextDecoration.none),
+  //                 )
+  //               : TextField(
+  //                   decoration: InputDecoration(
+  //                       hintText: title,
+  //                       hintStyle: TextStyle(
+  //                         color: Colors.white,
+  //                         fontSize: 25,
+  //                       ),
+  //                       border:
+  //                           OutlineInputBorder(borderSide: BorderSide.none)),
+  //                 )),
+  //     ),
+  //   );
+  // }
 }
