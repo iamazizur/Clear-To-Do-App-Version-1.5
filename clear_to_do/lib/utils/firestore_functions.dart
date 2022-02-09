@@ -6,7 +6,7 @@ import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
 import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:marquee/marquee.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -169,112 +169,123 @@ class _ListStreamsState extends State<ListStreams> {
     textEditingController.text = title;
 
     bool editIcon = false;
-    return Slidable(
-      startActionPane: ActionPane(motion: ScrollMotion(), children: [
-        SlidableAction(
-          onPressed: (context) => firestoreFunctions.changeTaskStatus(item),
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
-          icon: Icons.check,
-          label: 'Done',
-        ),
-        SlidableAction(
-          onPressed: null,
-          backgroundColor: Colors.blue.shade900,
-          foregroundColor: Colors.white,
-          icon: Icons.edit,
-          label: 'Edit',
-        ),
-      ]),
-      endActionPane: ActionPane(motion: ScrollMotion(), children: [
-        SlidableAction(
-          onPressed: (context) async =>
-              await firestoreFunctions.deleteItem(item.id),
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          icon: Icons.delete,
-          label: 'Delete',
-        ),
-      ]),
-      key: ValueKey(item.id),
-      child: Container(
-        padding: EdgeInsets.all(20),
-        color: isDone ? Colors.grey[700] : color,
-        alignment: Alignment.topCenter,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              color: Colors.yellow,
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: EditableText(
-                paintCursorAboveText: false,
-                showCursor: true,
-                onSubmitted: (value) =>
-                    firestoreFunctions.updateUserValue(item, value),
-                controller: textEditingController,
-                // FocusManager.instance.primaryFocus?.unfocus();
-                focusNode: FocusNode(),
-                
-                cursorColor: Colors.yellow,
-                backgroundCursorColor: Colors.green,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    decoration: isDone
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none),
-                autofocus: false,
+    return InkWell(
+      onTap: () {
+        if (mainScreen) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => NewTaskList(
+                parentId: (item.id),
               ),
-              // height: 100,
             ),
-            Icon(
+          );
+        } else {
+          return;
+        }
+      },
+      key: ValueKey(item['id']),
+      child: Slidable(
+        startActionPane: ActionPane(motion: ScrollMotion(), children: [
+          SlidableAction(
+            onPressed: (context) => firestoreFunctions.changeTaskStatus(item),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            icon: Icons.check,
+            label: 'Done',
+          ),
+          SlidableAction(
+            onPressed: null,
+            backgroundColor: Colors.blue.shade900,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: 'Edit',
+          ),
+        ]),
+        endActionPane: ActionPane(motion: ScrollMotion(), children: [
+          SlidableAction(
+            onPressed: (context) async =>
+                await firestoreFunctions.deleteItem(item.id),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+        ]),
+        key: ValueKey(item.id),
+        child: Container(
+          padding: EdgeInsets.all(20),
+          color: isDone ? Colors.grey[700] : color,
+          alignment: Alignment.topCenter,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                // color: Colors.green,
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: MediaQuery.of(context).size.width * 0.1,
+                child: Marquee(
+                    showFadingOnlyWhenScrolling: true,
+                    startAfter: Duration(seconds: 5),
+                    pauseAfterRound: Duration(seconds: 2),
+                    fadingEdgeEndFraction: 0.3,
+                    blankSpace: 100,
+                    velocity: 50,
+                    text: title,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        decoration: isDone
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none)),
+              ),
+              Icon(
+                Icons.drag_indicator_sharp,
+                color: Colors.white,
+              ),
+            ],
+          ),
+          /*
+          ListTile(
+            horizontalTitleGap: 30,
+            contentPadding: EdgeInsets.all(10),
+            leading: Icon(Icons.edgesensor_high),
+            onTap: () {
+              if (mainScreen) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NewTaskList(
+                      parentId: (item.id),
+                    ),
+                  ),
+                );
+              } else {
+                return;
+              }
+            },
+            trailing: Icon(
               Icons.drag_indicator_sharp,
               color: Colors.white,
             ),
-          ],
-        ),
-        /*
-        ListTile(
-          horizontalTitleGap: 30,
-          contentPadding: EdgeInsets.all(10),
-          leading: Icon(Icons.edgesensor_high),
-          onTap: () {
-            if (mainScreen) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => NewTaskList(
-                    parentId: (item.id),
-                  ),
-                ),
-              );
-            } else {
-              return;
-            }
-          },
-          trailing: Icon(
-            Icons.drag_indicator_sharp,
-            color: Colors.white,
+            title: EditableText(
+              paintCursorAboveText: true,
+              showCursor: true,
+              onSubmitted: (value) =>
+                  firestoreFunctions.updateUserValue(item, value),
+              controller: textEditingController,
+              focusNode: FocusNode(),
+              cursorColor: Colors.yellow,
+              backgroundCursorColor: Colors.green,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  decoration: isDone
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none),
+              autofocus: false,
+            ),
           ),
-          title: EditableText(
-            paintCursorAboveText: true,
-            showCursor: true,
-            onSubmitted: (value) =>
-                firestoreFunctions.updateUserValue(item, value),
-            controller: textEditingController,
-            focusNode: FocusNode(),
-            cursorColor: Colors.yellow,
-            backgroundCursorColor: Colors.green,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 25,
-                decoration: isDone
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none),
-            autofocus: false,
-          ),
+          */
         ),
-        */
       ),
     );
   }
