@@ -202,13 +202,30 @@ class _ListStreamsState extends State<ListStreams> {
         color: isDone ? Colors.grey[700] : color,
         alignment: Alignment.topCenter,
         child: Row(
-          
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               color: Colors.yellow,
-              width: 100,
-              child: Text(title),
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: EditableText(
+                paintCursorAboveText: false,
+                showCursor: true,
+                onSubmitted: (value) =>
+                    firestoreFunctions.updateUserValue(item, value),
+                controller: textEditingController,
+                // FocusManager.instance.primaryFocus?.unfocus();
+                focusNode: FocusNode(),
+                
+                cursorColor: Colors.yellow,
+                backgroundCursorColor: Colors.green,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    decoration: isDone
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none),
+                autofocus: false,
+              ),
               // height: 100,
             ),
             Icon(
