@@ -204,47 +204,97 @@ class _ListStreamsState extends State<ListStreams> {
       }),
       background: DeleteOrCheck.checkContainer,
       secondaryBackground: DeleteOrCheck.deleteContainer,
-      child: Container(
-        color: isDone ? Colors.grey[700] : color,
-        alignment: Alignment.topCenter,
-        child: ListTile(
-            contentPadding: EdgeInsets.all(10),
-            onTap: () {
-              if (mainScreen) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NewTaskList(
-                      parentId: (item.id),
-                    ),
-                  ),
-                );
-              } else {
-                return;
-              }
-            },
-            title: mainScreen
-                ? Text(
+      child: InkWell(
+        onTap: () {
+          if (mainScreen) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => NewTaskList(
+                  parentId: (item.id),
+                ),
+              ),
+            );
+          } else {
+            return;
+          }
+        },
+        child: Container(
+          color: isDone ? Colors.grey[700] : color,
+          padding: EdgeInsets.only(left: 15),
+          height: 80,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: MediaQuery.of(context).size.width * 0.1,
+                child: (title.length < 15)
+                    ? Text(
+                        title,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none),
+                      )
+                    : Marquee(
+                        showFadingOnlyWhenScrolling: true,
+                        startAfter: Duration(seconds: 5),
+                        pauseAfterRound: Duration(seconds: 5),
+                        fadingEdgeEndFraction: 0.3,
+                        blankSpace: 100,
+                        velocity: 50,
+                        text: title,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            decoration: isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/*
+  // marquee
+    /*
+                  Text(
                     title,
                     style: TextStyle(
-                        color: Colors.yellow,
-                        fontSize: 25,
+                        color: Colors.white,
+                        fontSize: 30,
                         decoration: isDone
                             ? TextDecoration.lineThrough
                             : TextDecoration.none),
-                  )
-                : TextField(
-                    decoration: InputDecoration(
-                        hintText: title,
-                        hintStyle: TextStyle(
+                  ),
+                  */
+                /*
+                  Marquee(
+                      showFadingOnlyWhenScrolling: true,
+                      startAfter: Duration(seconds: 5),
+                      pauseAfterRound: Duration(seconds: 2),
+                      fadingEdgeEndFraction: 0.3,
+                      blankSpace: 100,
+                      velocity: 50,
+                      text: title,
+                      style: TextStyle(
                           color: Colors.white,
                           fontSize: 25,
-                        ),
-                        border:
-                            OutlineInputBorder(borderSide: BorderSide.none)),
-                  )),
-      ),
-    );
+                          decoration: isDone
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none)),
+                */
     /*
+
+
+    
     return InkWell(
       onTap: () {
         if (mainScreen) {
@@ -404,9 +454,9 @@ class _ListStreamsState extends State<ListStreams> {
     );
   
     */
-  }
-
-  // Widget listTile(
+*/
+/*
+ // Widget listTile(
   //     dynamic item,
   //     Color color,
   //     int index,
@@ -477,4 +527,4 @@ class _ListStreamsState extends State<ListStreams> {
   //     ),
   //   );
   // }
-}
+*/
