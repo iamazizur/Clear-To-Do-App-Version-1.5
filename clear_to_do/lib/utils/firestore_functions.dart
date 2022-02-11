@@ -197,7 +197,54 @@ class _ListStreamsState extends State<ListStreams> {
     TextEditingController textEditingController = TextEditingController();
     textEditingController.text = title;
 
-    bool editIcon = false;
+    return Dismissible(
+      key: ValueKey(item.id),
+      confirmDismiss: ((direction) async {
+        return firestoreFunctions.dismissable(direction, item);
+      }),
+      background: DeleteOrCheck.checkContainer,
+      secondaryBackground: DeleteOrCheck.deleteContainer,
+      child: Container(
+        color: isDone ? Colors.grey[700] : color,
+        alignment: Alignment.topCenter,
+        child: ListTile(
+            contentPadding: EdgeInsets.all(10),
+            onTap: () {
+              if (mainScreen) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NewTaskList(
+                      parentId: (item.id),
+                    ),
+                  ),
+                );
+              } else {
+                return;
+              }
+            },
+            title: mainScreen
+                ? Text(
+                    title,
+                    style: TextStyle(
+                        color: Colors.yellow,
+                        fontSize: 25,
+                        decoration: isDone
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none),
+                  )
+                : TextField(
+                    decoration: InputDecoration(
+                        hintText: title,
+                        hintStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                        border:
+                            OutlineInputBorder(borderSide: BorderSide.none)),
+                  )),
+      ),
+    );
+    /*
     return InkWell(
       onTap: () {
         if (mainScreen) {
@@ -272,7 +319,7 @@ class _ListStreamsState extends State<ListStreams> {
                         text: title,
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 25,
+                            fontSize: 30,
                             decoration: isDone
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none)),
@@ -355,6 +402,8 @@ class _ListStreamsState extends State<ListStreams> {
         ),
       ),
     );
+  
+    */
   }
 
   // Widget listTile(

@@ -1,4 +1,7 @@
-// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace, prefer_final_fields
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
@@ -25,110 +28,78 @@ class CustomRefereshIndicator extends StatefulWidget {
 }
 
 class _CustomRefereshIndicatorState extends State<CustomRefereshIndicator> {
-  final _helper = IndicatorStateHelper();
-  ScrollDirection prevScrollDirection = ScrollDirection.forward;
-  IndicatorController controller = IndicatorController(refreshEnabled: true);
+  IndicatorController? _controller;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller = IndicatorController(refreshEnabled: true);
-    controller.isComplete;
+    _controller = IndicatorController(refreshEnabled: true);
   }
 
+  void handleTimeOut() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      print(_controller!.state);
+      print(_controller!.direction);
+      print('_controller!.value : ${_controller!.value}');
+    });
+  }
+
+  bool _isVisible = false;
   @override
   Widget build(BuildContext context) {
     var color = Colors.black;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: CustomRefreshIndicator(
-          controller: controller,
-          offsetToArmed: 200.0,
-          completeStateDuration: const Duration(seconds: 2),
-          loadingToIdleDuration: const Duration(seconds: 1),
-          armedToLoadingDuration: const Duration(seconds: 1),
-          draggingToIdleDuration: const Duration(seconds: 1),
-          leadingGlowVisible: true,
-          trailingGlowVisible: false,
-          onRefresh: () => Future.delayed(const Duration(seconds: 3)),
-          child: Container(
-            alignment: Alignment.center,
-            height: 300,
-            child: Text(
-              'data',
-              style: TextStyle(fontSize: 40),
-            ),
-          ),
-          /*
-          ListView.builder(
-            itemCount: 20,
-            itemBuilder: (context, index) => Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              margin: EdgeInsets.symmetric(vertical: 10),
-              color: Colors.amber,
-              child: Text('Azizur'),
-            ),
-          ),
-          */
-          builder: (
-            BuildContext context,
-            Widget child,
-            IndicatorController controller,
-          ) {
-            if (_helper.didStateChange(from: controller.state)) {
-              print('object');
-            }
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                (controller.isIdle) ? Text('isIdle') : Text('is-Not-Idle'),
-                Container(
-                  height: 100,
-                  color: Colors.amber,
-                  child: Center(
-                    child: Text(
-                      "NOT ARMED",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
+        body: SafeArea(
+      child: CustomRefreshIndicator(
+        loadingToIdleDuration: const Duration(seconds: 2),
+        armedToLoadingDuration: const Duration(seconds: 2),
+        draggingToIdleDuration: const Duration(seconds: 2),
+        leadingGlowVisible: true,
+        trailingGlowVisible: true,
+        offsetToArmed: 200,
+        controller: _controller,
+        onRefresh: () async {
+          print(_controller!.state);
+          Future.delayed(const Duration(seconds: 5));
+        },
+        child: ListView(
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  handleTimeOut();
+                },
+                child: Text(
+                  'controller state',
+                  style: TextStyle(fontSize: 20),
+                )),
+          ],
+        ),
+        builder: (context, child, controller) {
+          return Stack(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 100,
+                color: Colors.amber,
+                child: Text(
+                  'data',
+                  style: TextStyle(fontSize: 40),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 100),
-                  width: double.infinity,
-                  height: 50,
-                  color: Colors.greenAccent,
-                  child: Center(
-                    child: Text(
-                      "ARMED",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                AnimatedBuilder(
-                  animation: controller,
+              ),
+              AnimatedBuilder(
+                  animation: _controller!,
                   builder: (context, snapshot) {
                     return Transform.translate(
-                      offset: Offset(0.0, 100 * controller.value),
+                      // angle: 10 * _controller!.value,
+                      offset: Offset(0.0, 100 * _controller!.value),
                       child: child,
                     );
-                  },
-                ),
-              ],
-            );
-          },
-        ),
+                  }),
+            ],
+          );
+        },
       ),
-    );
+    ));
   }
 }

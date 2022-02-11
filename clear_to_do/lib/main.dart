@@ -6,9 +6,11 @@ import 'package:clear_to_do/screens/main_screen/custom_referesh_indicator.dart';
 import 'package:clear_to_do/screens/main_screen/main_screen.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
+import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
 import 'package:clear_to_do/screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/main_screen/main_screen_firebase.dart';
+import 'screens/main_screen/new_main_screen_with_custom_indicator.dart';
 import 'screens/main_screen/task_list_firestore.dart';
 import 'screens/signup_screen.dart';
 import 'screens/splash_screen.dart';
@@ -36,10 +38,13 @@ class ClearToDo extends StatelessWidget {
         primarySwatch: Colors.red,
         textTheme: GoogleFonts.quicksandTextTheme(Theme.of(context).textTheme),
       ),
+      debugShowCheckedModeBanner: false,
       title: 'Clear To Do',
-      initialRoute: CustomRefereshIndicator.id,
+      initialRoute: NewMainScreenFirebase.id,
       // initialRoute: TaskList.id,
       routes: {
+        NewTaskList.id: (context) => NewTaskList(parentId: ""),
+        MainScreenCustomIndicator.id: (context) => MainScreenCustomIndicator(),
         CustomRefereshIndicator.id: (context) => CustomRefereshIndicator(),
         NewMainScreenFirebase.id: (context) => NewMainScreenFirebase(),
         Check.id: ((context) => Check()),

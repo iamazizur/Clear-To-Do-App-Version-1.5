@@ -15,6 +15,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class NewTaskList extends StatefulWidget {
   NewTaskList({Key? key, required this.parentId}) : super(key: key);
   String parentId;
+  static const String id = 'newTaskList';
 
   @override
   _NewTaskListState createState() => _NewTaskListState(parentId);

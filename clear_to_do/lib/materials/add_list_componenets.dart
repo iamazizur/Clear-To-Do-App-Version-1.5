@@ -20,49 +20,52 @@ class _AddListWidgetState extends State<AddListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-            flex: 8,
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.black,
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) {
-                  userValue = value;
-                },
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(style: BorderStyle.none),
-                    ),
-                    focusedBorder:
-                        OutlineInputBorder(borderSide: BorderSide.none),
-                    hintText: widget.title,
-                    hintStyle: TextStyle(color: Colors.white)),
-              ),
-            )),
-        Expanded(
-          flex: 1,
-          child: InkWell(
-            onTap: () async {
-              userGeneratedValue = userValue;
-              await widget.buttonFunction();
-              searchController.clear();
-            },
-            child: Container(
-              color: Colors.blue,
-              child: Icon(
-                FontAwesomeIcons.plus,
-                color: Colors.white,
+    return Container(
+      height: 80,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+              flex: 8,
+              child: Container(
+                alignment: Alignment.center,
+                color: Colors.black,
+                child: TextField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    userValue = value;
+                  },
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(style: BorderStyle.none),
+                      ),
+                      focusedBorder:
+                          OutlineInputBorder(borderSide: BorderSide.none),
+                      hintText: widget.title,
+                      hintStyle: TextStyle(color: Colors.white)),
+                ),
+              )),
+          Expanded(
+            flex: 1,
+            child: InkWell(
+              onTap: () async {
+                userGeneratedValue = userValue;
+                await widget.buttonFunction();
+                searchController.clear();
+              },
+              child: Container(
+                color: Colors.blue,
+                child: Icon(
+                  FontAwesomeIcons.plus,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }
