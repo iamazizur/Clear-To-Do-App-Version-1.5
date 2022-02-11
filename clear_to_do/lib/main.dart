@@ -2,6 +2,7 @@
 
 import 'package:clear_to_do/check.dart';
 import 'package:clear_to_do/screens/dismissable.dart';
+import 'package:clear_to_do/screens/main_screen/custom_referesh_indicator.dart';
 import 'package:clear_to_do/screens/main_screen/main_screen.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
@@ -36,9 +37,10 @@ class ClearToDo extends StatelessWidget {
         textTheme: GoogleFonts.quicksandTextTheme(Theme.of(context).textTheme),
       ),
       title: 'Clear To Do',
-      initialRoute: MainScreenFirebase.id,
+      initialRoute: CustomRefereshIndicator.id,
       // initialRoute: TaskList.id,
       routes: {
+        CustomRefereshIndicator.id: (context) => CustomRefereshIndicator(),
         NewMainScreenFirebase.id: (context) => NewMainScreenFirebase(),
         Check.id: ((context) => Check()),
         Dissmisable.id: (context) => Dissmisable(),
