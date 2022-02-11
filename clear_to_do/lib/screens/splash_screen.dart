@@ -14,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  int updatedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,31 +22,65 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10),
           color: HexColor('#E9E3DE'),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                flex: 6,
-                child: PageView.builder(
-                    itemCount: splashScreenList.length,
-                    itemBuilder: (context, index) {
-                      return splashScreenList[index];
-                    }),
-              ),
-              SizedBox(height: 10),
-              Expanded(
-                flex: 1,
-                child: LoginComponent(),
-              ),
+              PageView.builder(
+                  itemCount: splashScreenList.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      updatedIndex = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return splashScreenList[index];
+                  }),
+              // SizedBox(height: 10),
+              newMethod(updatedIndex),
             ],
           ),
         ),
       ),
     );
   }
+
+  Positioned newMethod(int updatedIndex) {
+    return Positioned(
+        bottom: 15,
+        // width: double.infinity,
+        child: Container(
+          height: 50,
+          width: MediaQuery.of(context).size.width * 1,
+          alignment: Alignment.center,
+          // color: Colors.amber,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemCount: splashScreenList.length,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: EdgeInsets.all(5),
+                width: 15,
+                // height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(10),
+                  color:
+                      (updatedIndex == index) ? Colors.white : Colors.white24,
+                ),
+              );
+            },
+          ),
+        ));
+  }
 }
 
-
+/*
+Expanded(
+                flex: 1,
+                child: LoginComponent(),
+              ),
+*/
 
 List<dynamic> splashScreenList = [
   SplashScreenFirst(),

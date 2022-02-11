@@ -40,7 +40,7 @@ class ClearToDo extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Clear To Do',
-      initialRoute: NewMainScreenFirebase.id,
+      initialRoute: SplashScreen.id,
       // initialRoute: TaskList.id,
       routes: {
         NewTaskList.id: (context) => NewTaskList(parentId: ""),

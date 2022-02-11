@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables
 
+import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
+import 'package:clear_to_do/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 // import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -214,7 +217,7 @@ class SplashScreenSixth extends StatelessWidget {
             child: RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                  style: TextStyle(
+                  style: GoogleFonts.quicksand(
                       fontSize: 25,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
@@ -222,9 +225,9 @@ class SplashScreenSixth extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: 'Tap on a list',
-                      style: TextStyle(
+                      style: GoogleFonts.quicksand(
                           color: HexColor('#E60965'),
-                          fontWeight: FontWeight.w700),
+                          fontWeight: FontWeight.w500),
                     ),
                     TextSpan(text: ' to see its content'),
                     TextSpan(text: '\n'),
@@ -232,7 +235,7 @@ class SplashScreenSixth extends StatelessWidget {
                       text: 'Tap on a list title',
                       style: TextStyle(
                           color: HexColor('#E60965'),
-                          fontWeight: FontWeight.w700),
+                          fontWeight: FontWeight.w500),
                     ),
                     TextSpan(text: ' to edit it..'),
                   ]),
@@ -257,7 +260,7 @@ class SplashScreenSeventh extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Are you read?',
+          'Are you ready?',
           style: TextStyle(fontSize: 25),
         ),
         Text(
@@ -274,14 +277,14 @@ class SplashScreenSeventh extends StatelessWidget {
               primary: 'Yes,',
               secondary: 'I got it',
               onpress: () {
-                print('yes button pressed');
+                Navigator.pushNamed(context, NewMainScreenFirebase.id);
               },
             ),
             ConfirmationButtons(
               primary: 'No,',
               secondary: 'I want to see tutorial',
               onpress: () {
-                print('no button pressed');
+                Navigator.pushNamed(context, SplashScreen.id);
               },
             ),
           ],
