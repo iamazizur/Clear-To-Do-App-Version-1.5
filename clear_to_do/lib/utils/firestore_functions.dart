@@ -152,13 +152,6 @@ class _ListStreamsState extends State<ListStreams> {
             dragStartBehavior: DragStartBehavior.start,
             onReorder: ((oldIndex, newIndex) async {
               final finalIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
-              // if (newIndex >= finalLists.length)
-              //   newIndex = finalLists.length - 1;
-              // if (newIndex == oldIndex + 1) newIndex--;
-
-              // if (newIndex < 0) newIndex = 0;
-              print('oldIndex : $oldIndex');
-              print('newIndex : $finalIndex');
 
               firestoreFunctions.swapTasks(
                   finalLists[oldIndex], finalLists[finalIndex]);
@@ -194,9 +187,6 @@ class _ListStreamsState extends State<ListStreams> {
       FirestoreFunctions firestoreFunctions,
       Function ontap,
       bool mainScreen) {
-    TextEditingController textEditingController = TextEditingController();
-    textEditingController.text = title;
-
     return Dismissible(
       key: ValueKey(item.id),
       confirmDismiss: ((direction) async {
@@ -219,46 +209,42 @@ class _ListStreamsState extends State<ListStreams> {
           }
         },
         child: Container(
-          color: isDone ? Colors.grey[700] : color,
-          padding: EdgeInsets.only(left: 15),
-          height: 80,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: MediaQuery.of(context).size.width * 0.1,
-                child: (title.length < 15)
-                    ? Text(
-                        title,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            decoration: isDone
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none),
-                      )
-                    : Marquee(
-                        showFadingOnlyWhenScrolling: true,
-                        startAfter: Duration(seconds: 5),
-                        pauseAfterRound: Duration(seconds: 5),
-                        fadingEdgeEndFraction: 0.3,
-                        blankSpace: 100,
-                        velocity: 50,
-                        text: title,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            decoration: isDone
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none)),
-              ),
-            ],
-          ),
-        ),
+            color: isDone ? Colors.grey[700] : color,
+            padding: EdgeInsets.only(left: 15),
+            width: MediaQuery.of(context).size.width * 1,
+            alignment: Alignment.centerLeft,
+            height: 80,
+            child: titleGenerator(title, isDone)),
       ),
     );
+  }
+
+  Widget titleGenerator(String title, bool isDone) {
+    if (title.length < 15) {
+      return Text(
+        title,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            decoration:
+                isDone ? TextDecoration.lineThrough : TextDecoration.none),
+      );
+    } else {
+      return Marquee(
+        showFadingOnlyWhenScrolling: true,
+        startAfter: Duration(seconds: 5),
+        pauseAfterRound: Duration(seconds: 5),
+        fadingEdgeEndFraction: 0.3,
+        blankSpace: 100,
+        velocity: 50,
+        text: title,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+            decoration:
+                isDone ? TextDecoration.lineThrough : TextDecoration.none),
+      );
+    }
   }
 }
 
