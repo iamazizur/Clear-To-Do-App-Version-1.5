@@ -16,57 +16,141 @@ class Check extends StatefulWidget {
   _CheckState createState() => _CheckState();
 }
 
+double dy = 10;
+
 class _CheckState extends State<Check> {
-  bool isVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: (() async {
-          setState(() {
-          isVisible = (isVisible) ? false : true ;
-          });
-        }),
-        child: Column(
-          children: [
-            Visibility(
-              visible: isVisible,
-              child: Expanded(
-                flex: 2,
-                  child: Container(
-                color: Colors.green,
-              )),
+      body: Center(
+        child: GestureDetector(
+          
+          onVerticalDragEnd: (details) {
+            print('end');
+            setState(() {
+              dy = 0;
+            });
+          },
+          onVerticalDragDown: (details) {
+            print(details.runtimeType);
+            setState(() {});
+          },
+          onVerticalDragUpdate: (details) {
+            if(details.localPosition.dy > 200){
+
+            }
+            setState(() {
+              var x = details.localPosition;
+
+              dy = x.dy;
+              print('dy: $dy');
+            });
+          },
+          child: Stack(children: [
+            Container(
+              width: 300,
+              height: 200,
+              color: Colors.red,
             ),
-            Expanded(
-              flex: 8,
-              child: ReorderableListView.builder(
-                onReorder: (oldIndex, newIndex) {
-                  print('oldIndex : $oldIndex');
-                  print('newIndex : $newIndex');
-                },
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  return Visibility(
-                    key: ValueKey(index * 20),
-                    visible: (index == 3) ? true : true,
-                    child: (index == 3)
-                        ? Container(
-                            margin: EdgeInsets.all(10),
-                            height: 50,
-                            color: Colors.red,
-                          )
-                        : Container(
-                            margin: EdgeInsets.all(10),
-                            height: 50,
-                            color: Colors.amber,
-                          ),
-                  );
-                },
+            Transform.translate(
+              offset: Offset(0, 0.1*dy),
+              child: Container(
+                margin: EdgeInsets.only(top: 30),
+                width: 300,
+                height: 200,
+                color: Colors.cyan,
               ),
             ),
-          ],
+           
+          ]),
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// class Check extends StatefulWidget {
+//   const Check({Key? key}) : super(key: key);
+//   static const String id = 'check';
+
+//   @override
+//   _CheckState createState() => _CheckState();
+// }
+
+// class _CheckState extends State<Check> {
+//   bool isVisible = false;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: RefreshIndicator(
+//         onRefresh: (() async {
+//           setState(() {
+//           isVisible = (isVisible) ? false : true ;
+//           });
+//         }),
+//         child: Column(
+//           children: [
+//             Visibility(
+//               visible: isVisible,
+//               child: Expanded(
+//                 flex: 2,
+//                   child: Container(
+//                 color: Colors.green,
+//               )),
+//             ),
+//             Expanded(
+//               flex: 8,
+//               child: ReorderableListView.builder(
+//                 onReorder: (oldIndex, newIndex) {
+//                   print('oldIndex : $oldIndex');
+//                   print('newIndex : $newIndex');
+//                 },
+//                 itemCount: 6,
+//                 itemBuilder: (context, index) {
+//                   return Visibility(
+//                     key: ValueKey(index * 20),
+//                     visible: (index == 3) ? true : true,
+//                     child: (index == 3)
+//                         ? Container(
+//                             margin: EdgeInsets.all(10),
+//                             height: 50,
+//                             color: Colors.red,
+//                           )
+//                         : Container(
+//                             margin: EdgeInsets.all(10),
+//                             height: 50,
+//                             color: Colors.amber,
+//                           ),
+//                   );
+//                 },
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

@@ -182,6 +182,9 @@ class _ListStreamsState extends State<ListStreams> {
               String title = item['title'];
               bool visibility = addReminderVisibility[index];
               bool isDone = item['isDone'];
+              final TextEditingController textEditingController =
+                  TextEditingController(text: title);
+              final FocusNode myFocus = FocusNode();
               return Dismissible(
                 key: ValueKey(item.id),
                 confirmDismiss: ((direction) async {
@@ -199,16 +202,7 @@ class _ListStreamsState extends State<ListStreams> {
                           ),
                         ),
                       );
-                    } else {
-                      print('before tap: $visibility');
-                      setState(() {
-                        if (visibility == true)
-                          visibility = false;
-                        else
-                          visibility = true;
-                      });
-                      print('after tap: $visibility');
-                    }
+                    } else {}
                   },
                   child: Container(
                     color: isDone ? Colors.grey[700] : color,
@@ -219,7 +213,20 @@ class _ListStreamsState extends State<ListStreams> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        titleGenerator(title, isDone),
+                        EditableText(
+                          backgroundCursorColor: Colors.black,
+                          cursorColor: Colors.black,
+                          controller: textEditingController,
+                          focusNode: myFocus,
+                          // title,
+                          maxLines: 1,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              decoration: isDone
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none),
+                        ),
                         Visibility(
                           visible: visibility,
                           child: InkWell(

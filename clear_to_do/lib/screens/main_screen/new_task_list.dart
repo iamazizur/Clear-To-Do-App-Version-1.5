@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -126,7 +127,10 @@ class _NewTaskListState extends State<NewTaskList> {
                           String reminder = item['reminder'];
                           // bool visibility = addReminderVisibility[index];
                           bool isDone = item['isDone'];
+                          TextEditingController textEditingController =
+                              TextEditingController(text: title);
                           return NewWidget(
+                            textEditingController: textEditingController,
                             item: item,
                             firestoreFunctions: firestoreFunctions,
                             isDone: isDone,
@@ -145,34 +149,6 @@ class _NewTaskListState extends State<NewTaskList> {
                   },
                 ),
               ),
-              Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    child: Text('Show Datepicker'),
-                    onPressed: () {
-                      showCupertinoModalPopup(
-                          context: context,
-                          builder: (context) {
-                            return CupertinoActionSheet(
-                              actions: [
-                                SizedBox(
-                                  height: 180,
-                                  child: CupertinoDatePicker(
-                                      onDateTimeChanged: (dateTime) {
-                                    print(dateTime);
-                                  }),
-                                ),
-                              ],
-                              cancelButton: CupertinoActionSheetAction(
-                                child: Text('Done'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            );
-                          });
-                    },
-                  )),
             ],
           ),
         ),
@@ -190,7 +166,8 @@ class NewWidget extends StatefulWidget {
       required this.title,
       required this.key,
       required this.reminder,
-      required this.parentId});
+      required this.parentId,
+      required this.textEditingController});
 
   final item;
   final FirestoreFunctions firestoreFunctions;
@@ -200,27 +177,27 @@ class NewWidget extends StatefulWidget {
   final Key key;
   String reminder;
   final String parentId;
+  final TextEditingController textEditingController;
 
   @override
-  State<NewWidget> createState() => _NewWidgetState(reminder: reminder);
+  State<NewWidget> createState() => _NewWidgetState(
+      reminder: reminder, textEditingController: textEditingController);
 }
 
 class _NewWidgetState extends State<NewWidget> {
   bool visibility = false;
   String? reminder;
   String updatedTime = '';
+  final TextEditingController textEditingController;
 
   String reminderText = 'Add reminder';
-  _NewWidgetState({required this.reminder});
+  _NewWidgetState(
+      {required this.reminder, required this.textEditingController});
 
   DateTime dateTime = DateTime.now();
+  FocusNode myfocus = FocusNode();
   @override
   Widget build(BuildContext context) {
-    // if (reminder!.isEmpty) {
-    //   reminderText = 'Add reminder';
-    // } else {
-    //   reminderText = reminder!;
-    // }
     return Dismissible(
       key: ValueKey(widget.item.id),
       confirmDismiss: ((direction) async {
@@ -249,9 +226,30 @@ class _NewWidgetState extends State<NewWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.title,
-                style: TextStyle(fontSize: 30, color: Colors.white),
+              EditableText(
+                onSubmitted: (value) {
+                  FocusScope.of(context).unfocus();
+                  FirebaseFirestore.instance
+                      .collection('collection')
+                      .doc(widget.parentId)
+                      .collection('tasks')
+                      .doc(widget.item['id'])
+                      .update({'title': textEditingController.text}).then(
+                          (value) {
+                    setState(() {});
+                  });
+                },
+                backgroundCursorColor: Colors.black,
+                cursorColor: Colors.black,
+                focusNode: myfocus,
+                controller: textEditingController,
+                // widget.title,
+                style: GoogleFonts.quicksand(
+                  fontSize: 30,
+                  color: Colors.white,
+                  decoration:
+                      (widget.isDone) ? TextDecoration.lineThrough : null,
+                ),
               ),
               Visibility(
                 visible: visibility,

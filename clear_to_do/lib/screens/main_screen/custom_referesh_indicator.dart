@@ -37,11 +37,11 @@ class _CustomRefereshIndicatorState extends State<CustomRefereshIndicator> {
     _controller = IndicatorController(refreshEnabled: true);
   }
 
-  void handleTimeOut() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      print(_controller!.state);
-      print(_controller!.direction);
-      print('_controller!.value : ${_controller!.value}');
+  Future<bool> fun() async {
+
+    return Future.delayed(Duration(seconds: 5), () {
+      print('fun');
+      return true;
     });
   }
 
@@ -59,20 +59,22 @@ class _CustomRefereshIndicatorState extends State<CustomRefereshIndicator> {
         trailingGlowVisible: true,
         offsetToArmed: 200,
         controller: _controller,
+        extentPercentageToArmed: 0.1,
         onRefresh: () async {
-          print(_controller!.state);
-          Future.delayed(const Duration(seconds: 5));
+          
+          await fun();
         },
         child: ListView(
           children: [
             ElevatedButton(
                 onPressed: () {
-                  handleTimeOut();
+                  // handleTimeOut();
                 },
                 child: Text(
                   'controller state',
                   style: TextStyle(fontSize: 20),
                 )),
+            
           ],
         ),
         builder: (context, child, controller) {
@@ -82,9 +84,9 @@ class _CustomRefereshIndicatorState extends State<CustomRefereshIndicator> {
                 width: double.infinity,
                 height: 100,
                 color: Colors.amber,
-                child: Text(
-                  'data',
-                  style: TextStyle(fontSize: 40),
+                child: AddListWidget(
+                  buttonFunction: () {},
+                  title: 'Add data',
                 ),
               ),
               AnimatedBuilder(
