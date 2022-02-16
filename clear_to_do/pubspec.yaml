@@ -44,6 +44,7 @@ dependencies:
   flutter_slidable: ^1.2.0
   marquee: ^2.2.0
   custom_refresh_indicator: ^1.0.0
+  flutter_datetime_picker: ^1.5.1
   
   
 

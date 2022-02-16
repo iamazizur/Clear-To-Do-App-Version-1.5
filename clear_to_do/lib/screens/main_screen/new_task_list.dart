@@ -7,10 +7,12 @@ import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
 import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 List<Color> colorsList = [
   Colors.red.shade800,
@@ -80,7 +82,8 @@ class _NewTaskListState extends State<NewTaskList> {
                           map: {
                             'id': '',
                             'title': userGeneratedValue,
-                            'isDone': false
+                            'isDone': false,
+                            'reminder': ''
                           }).addItem().then((value) {
                         setState(() {
                           _isVisible = (_isVisible) ? false : true;
@@ -120,6 +123,7 @@ class _NewTaskListState extends State<NewTaskList> {
                           int len = finalLists.length;
 
                           String title = item['title'];
+                          String reminder = item['reminder'];
                           // bool visibility = addReminderVisibility[index];
                           bool isDone = item['isDone'];
                           return NewWidget(
@@ -128,7 +132,11 @@ class _NewTaskListState extends State<NewTaskList> {
                             isDone: isDone,
                             color: color,
                             title: title,
-                            key: ValueKey(item['id']),
+                            key: ValueKey(
+                              item['id'],
+                            ),
+                            reminder: reminder,
+                            parentId: parentId,
                           );
                         },
                       );
@@ -137,6 +145,34 @@ class _NewTaskListState extends State<NewTaskList> {
                   },
                 ),
               ),
+              Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    child: Text('Show Datepicker'),
+                    onPressed: () {
+                      showCupertinoModalPopup(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoActionSheet(
+                              actions: [
+                                SizedBox(
+                                  height: 180,
+                                  child: CupertinoDatePicker(
+                                      onDateTimeChanged: (dateTime) {
+                                    print(dateTime);
+                                  }),
+                                ),
+                              ],
+                              cancelButton: CupertinoActionSheetAction(
+                                child: Text('Done'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
+                          });
+                    },
+                  )),
             ],
           ),
         ),
@@ -146,13 +182,15 @@ class _NewTaskListState extends State<NewTaskList> {
 }
 
 class NewWidget extends StatefulWidget {
-  const NewWidget(
+  NewWidget(
       {required this.item,
       required this.firestoreFunctions,
       required this.isDone,
       required this.color,
       required this.title,
-      required this.key});
+      required this.key,
+      required this.reminder,
+      required this.parentId});
 
   final item;
   final FirestoreFunctions firestoreFunctions;
@@ -160,15 +198,29 @@ class NewWidget extends StatefulWidget {
   final Color color;
   final String title;
   final Key key;
+  String reminder;
+  final String parentId;
 
   @override
-  State<NewWidget> createState() => _NewWidgetState();
+  State<NewWidget> createState() => _NewWidgetState(reminder: reminder);
 }
 
 class _NewWidgetState extends State<NewWidget> {
   bool visibility = false;
+  String? reminder;
+  String updatedTime = '';
+
+  String reminderText = 'Add reminder';
+  _NewWidgetState({required this.reminder});
+
+  DateTime dateTime = DateTime.now();
   @override
   Widget build(BuildContext context) {
+    // if (reminder!.isEmpty) {
+    //   reminderText = 'Add reminder';
+    // } else {
+    //   reminderText = reminder!;
+    // }
     return Dismissible(
       key: ValueKey(widget.item.id),
       confirmDismiss: ((direction) async {
@@ -185,6 +237,7 @@ class _NewWidgetState extends State<NewWidget> {
               visibility = true;
             }
           });
+          print(reminder);
         },
         child: Container(
           color: widget.isDone ? Colors.grey[700] : widget.color,
@@ -203,18 +256,70 @@ class _NewWidgetState extends State<NewWidget> {
               Visibility(
                 visible: visibility,
                 child: InkWell(
-                  
-                  child: Text(
-                    'Add reminder',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                    onTap: () {
+                      print(dateTime);
+                      showCupertinoModalPopup(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoActionSheet(
+                              actions: [
+                                SizedBox(
+                                  height: 180,
+                                  child: CupertinoDatePicker(
+                                      onDateTimeChanged: (dateTime) {
+                                    setState(() {
+                                      var hour = dateTime.hour;
+                                      var minute = dateTime.minute;
+                                      var day = dateTime.day;
+                                      var month = dateTime.month;
+                                      var year = dateTime.year;
+
+                                      reminderText =
+                                          '$day-$month-$year at $hour : $minute';
+                                      updatedTime = reminderText;
+                                      reminder = reminderText;
+                                      print('reminderText : $reminderText');
+                                    });
+                                  }),
+                                ),
+                              ],
+                              cancelButton: CupertinoActionSheetAction(
+                                child: Text('Done'),
+                                onPressed: () {
+                                  FirebaseFirestore.instance
+                                      .collection('collection')
+                                      .doc(widget.parentId)
+                                      .collection('tasks')
+                                      .doc(widget.item['id'])
+                                      .update({'reminder': updatedTime}).then(
+                                          (value) {
+                                    setState(() {});
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
+                          });
+                    },
+                    child: Text(
+                      (checkReminderValue()) ? reminderText : reminder!,
+                      // reminder!,
+                      style: TextStyle(color: Colors.white),
+                    )),
               )
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool checkReminderValue() {
+    if (reminder!.isEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
