@@ -16,12 +16,7 @@ class MainSubScreen extends StatefulWidget {
 
 class _MainSubScreenState extends State<MainSubScreen> {
   List<dynamic> generatedList = subList;
-  @override
-  void initState() {
-    // super.initState();
-    print(generatedList);
-    print(generatedList.runtimeType);
-  }
+  
 
   @override
   Widget build(BuildContext context) {

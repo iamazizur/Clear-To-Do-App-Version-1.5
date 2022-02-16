@@ -13,6 +13,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+List<Color> colorsList = [
+  Colors.red.shade800,
+  Colors.orange.shade900,
+  Colors.orange.shade800,
+  Colors.orange.shade700,
+  Colors.orange.shade600,
+  Colors.orange.shade500,
+  Colors.orange.shade400,
+  Colors.orange.shade300,
+];
+
 class FirestoreFunctions {
   static FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final CollectionReference collectionReference;
@@ -148,7 +159,7 @@ class _ListStreamsState extends State<ListStreams> {
 
           List<dynamic> finalLists = firestoreFunctions.generateList(items);
           List<bool> addReminderVisibility =
-              List.generate(finalLists.length, (index) => true);
+              List.generate(finalLists.length, (index) => false);
 
           return ReorderableListView.builder(
             dragStartBehavior: DragStartBehavior.start,
@@ -160,27 +171,78 @@ class _ListStreamsState extends State<ListStreams> {
             }),
             itemCount: finalLists.length,
             itemBuilder: (context, index) {
+              int colorIndex = index;
+              if (colorIndex >= finalLists.length) {
+                colorIndex = finalLists.length - 1;
+              }
+              Color color = colorsList[colorIndex];
               final item = finalLists[index];
               int len = finalLists.length;
-              int fraction = 255 ~/ (len);
-              int val = (255 - (fraction * index));
-              Color colorRed = Color.fromRGBO((val), 0, 0, 1);
-              Color colorBlue = Color.fromRGBO(0, 0, (val), 1);
-              Color color = mainScreen ? colorRed : colorBlue;
+
               String title = item['title'];
               bool visibility = addReminderVisibility[index];
+              bool isDone = item['isDone'];
+              return Dismissible(
+                key: ValueKey(item.id),
+                confirmDismiss: ((direction) async {
+                  return firestoreFunctions.dismissable(direction, item);
+                }),
+                background: DeleteOrCheck.checkContainer,
+                secondaryBackground: DeleteOrCheck.deleteContainer,
+                child: InkWell(
+                  onTap: () {
+                    if (mainScreen) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => NewTaskList(
+                            parentId: (item.id),
+                          ),
+                        ),
+                      );
+                    } else {
+                      print('before tap: $visibility');
+                      setState(() {
+                        if (visibility == true)
+                          visibility = false;
+                        else
+                          visibility = true;
+                      });
+                      print('after tap: $visibility');
+                    }
+                  },
+                  child: Container(
+                    color: isDone ? Colors.grey[700] : color,
+                    padding: EdgeInsets.only(left: 15),
+                    width: MediaQuery.of(context).size.width * 1,
+                    alignment: Alignment.centerLeft,
+                    height: 80,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        titleGenerator(title, isDone),
+                        Visibility(
+                          visible: visibility,
+                          child: InkWell(
+                            child: Text('Add reminder'),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
 
-              return listTile(
-                  item,
-                  color,
-                  index,
-                  context,
-                  title,
-                  item['isDone'],
-                  firestoreFunctions,
-                  () {},
-                  mainScreen,
-                  visibility);
+              // return listTile(
+              //     item,
+              //     color,
+              //     index,
+              //     context,
+              //     title,
+              //     item['isDone'],
+              //     firestoreFunctions,
+              //     () {},
+              //     mainScreen,
+              //     visibility);
             },
           );
         }
@@ -278,6 +340,8 @@ class _ListStreamsState extends State<ListStreams> {
     }
   }
 }
+
+
 
 /*
   // marquee

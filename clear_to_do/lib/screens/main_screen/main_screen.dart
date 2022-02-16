@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, unused_local_variable
 import 'package:clear_to_do/materials/add_list_componenets.dart';
+import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
 import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
+import 'package:clear_to_do/utils/routes_generator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,29 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   TextEditingController createListText = TextEditingController();
   String userListValue = '';
 
-  CollectionReference tasks = FirebaseFirestore.instance.collection('lists');
-  void fun() async {
-    var taskList = await tasks.get().then((value) {
-      print(value.docs[0]);
-      print(value.docs.runtimeType);
-    });
-    // var x = taskList;
-    // print(x);
-    // print(x.runtimeType);
-  }
-
   @override
-  void initState() {
-    // ignore: todo
-    // TODO: implement initState
-    super.initState();
-    // print(tasks.doc());
-    fun();
-  }
-
-  @override
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,61 +41,143 @@ class _MainScreenState extends State<MainScreen> {
                 title: 'Create a new list',
                 buttonFunction: () {
                   setState(() {
+                    int id = mainScreenList.last['id'] as int;
+                    id++;
                     Map<String, Object> map = {
-                      'name': userGeneratedValue,
-                      'task': []
+                      'title': userGeneratedValue,
+                      'task': [],
+                      'isDone': false,
+                      'id': id,
                     };
-                    headingTaskList.insert(0, map);
+                    mainScreenList.add(map);
+                    print(map);
                   });
                 },
               ),
             ),
             Expanded(
               flex: 8,
-              child: ListView.builder(
-                itemCount: headingTaskList.length,
+              child: ReorderableListView.builder(
+                onReorder: (oldIndex, newIndex) {},
+                itemCount: mainScreenList.length,
                 itemBuilder: (context, index) {
-                  int val = (255 - (index * 30));
-                  if (val <= 0) val = 0;
-                  var _text = headingTaskList[index]['name'].toString();
-                  var _args = headingTaskList[index]['task'];
-
-                  return Container(
-                    color: Color.fromRGBO((val), 0, 0, 1),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(10),
-                      onTap: () {
-                        // Navigator.pushNamed(context, MainSubScreen.id);
-                        Navigator.of(context)
-                            .pushNamed('/mainSubScreen', arguments: _args);
-                      },
-                      onLongPress: () {
-                        setState(() {
-                          headingTaskList.removeAt(index);
-                          print('Long Pressed at index: $index');
-                        });
-                      },
-                      title: Text(
-                        _text,
-                        style: TextStyle(color: Colors.white, fontSize: 25),
-                      ),
-                    ),
+                  int colorIndex = index;
+                  print(mainScreenList.length);
+                  if (colorIndex >= colorsList.length - 1) {
+                    colorIndex = colorsList.length - 1;
+                  }
+                  Color color = colorsList[colorIndex];
+                  String title = mainScreenList[index]['title'].toString();
+                  var args = mainScreenList[index]['tasks'];
+                  final TextEditingController controller =
+                      TextEditingController(text: title);
+                  final key = ValueKey(mainScreenList[index]['id']);
+                  final bool isDone = mainScreenList[index]['isDone'] as bool;
+                  final Map item = mainScreenList[index];
+                  var lists = mainScreenList[index]['tasks'];
+                  return List(
+                    color: color,
+                    title: title,
+                    controller: controller,
+                    key: key,
+                    isDone: isDone,
+                    lists: lists,
+                    index: index,
                   );
                 },
               ),
             ),
-            Expanded(
-                flex: 1,
-                child: ElevatedButton(
-                  child: Text('getMapData'),
-                  onPressed: () {
-                    headingTaskList.forEach((element) {
-                      if (element['name'] == 'List 1') print('found');
-                    });
-                  },
-                )),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class List extends StatefulWidget {
+  const List(
+      {required this.color,
+      required this.title,
+      required this.controller,
+      required this.key,
+      required this.isDone,
+      required this.lists,
+      required this.index});
+
+  final Color color;
+  final String title;
+  final TextEditingController controller;
+  @override
+  final Key key;
+  final bool isDone;
+  final lists;
+  final int index;
+
+  @override
+  State<List> createState() => _ListState();
+}
+
+class _ListState extends State<List> {
+  bool visibility = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: widget.key,
+      confirmDismiss: (direction) async {
+        return false;
+      },
+      background: DeleteOrCheck.checkContainer,
+      secondaryBackground: DeleteOrCheck.deleteContainer,
+      child: InkWell(
+        onTap: () {
+          
+        },
+        child: Container(
+            color: widget.isDone ? Colors.grey[700] : widget.color,
+            width: double.infinity,
+            // height: 80,
+            // margin: EdgeInsets.symmetric(vertical: 5),
+            padding: EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  color: Colors.green,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: EditableText(
+                    onSubmitted: (value) {
+                      setState(() {
+                        widget.controller.text = value;
+                        mainScreenList[widget.index]['title'] = value;
+                        print(mainScreenList[widget.index]['title']);
+                      });
+                    },
+                    backgroundCursorColor: Colors.black,
+                    cursorColor: Colors.black,
+                    controller: widget.controller,
+                    focusNode: FocusNode(),
+                    style: GoogleFonts.quicksand(
+                        fontSize: 30,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Visibility(
+                  visible: visibility,
+                  child: InkWell(
+                    child: Text(
+                      'Add reminder',
+                      style: GoogleFonts.quicksand(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )),
       ),
     );
   }
