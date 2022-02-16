@@ -147,6 +147,8 @@ class _ListStreamsState extends State<ListStreams> {
           var items = snapshot.data!.docs;
 
           List<dynamic> finalLists = firestoreFunctions.generateList(items);
+          List<bool> addReminderVisibility =
+              List.generate(finalLists.length, (index) => true);
 
           return ReorderableListView.builder(
             dragStartBehavior: DragStartBehavior.start,
@@ -166,9 +168,19 @@ class _ListStreamsState extends State<ListStreams> {
               Color colorBlue = Color.fromRGBO(0, 0, (val), 1);
               Color color = mainScreen ? colorRed : colorBlue;
               String title = item['title'];
+              bool visibility = addReminderVisibility[index];
 
-              return listTile(item, color, index, context, title,
-                  item['isDone'], firestoreFunctions, () {}, mainScreen);
+              return listTile(
+                  item,
+                  color,
+                  index,
+                  context,
+                  title,
+                  item['isDone'],
+                  firestoreFunctions,
+                  () {},
+                  mainScreen,
+                  visibility);
             },
           );
         }
@@ -186,7 +198,8 @@ class _ListStreamsState extends State<ListStreams> {
       bool isDone,
       FirestoreFunctions firestoreFunctions,
       Function ontap,
-      bool mainScreen) {
+      bool mainScreen,
+      bool visibility) {
     return Dismissible(
       key: ValueKey(item.id),
       confirmDismiss: ((direction) async {
@@ -205,7 +218,14 @@ class _ListStreamsState extends State<ListStreams> {
               ),
             );
           } else {
-            return;
+            print('before tap: $visibility');
+            setState(() {
+              if (visibility == true)
+                visibility = false;
+              else
+                visibility = true;
+            });
+            print('after tap: $visibility');
           }
         },
         child: Container(
@@ -214,7 +234,18 @@ class _ListStreamsState extends State<ListStreams> {
             width: MediaQuery.of(context).size.width * 1,
             alignment: Alignment.centerLeft,
             height: 80,
-            child: titleGenerator(title, isDone)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                titleGenerator(title, isDone),
+                Visibility(
+                  visible: visibility,
+                  child: InkWell(
+                    child: Text('Add reminder'),
+                  ),
+                )
+              ],
+            )),
       ),
     );
   }
