@@ -35,6 +35,7 @@ class ClearToDo extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        backgroundColor: Colors.black,
         primarySwatch: Colors.red,
         textTheme: GoogleFonts.quicksandTextTheme(Theme.of(context).textTheme),
       ),

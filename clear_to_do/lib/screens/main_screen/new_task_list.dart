@@ -16,14 +16,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 List<Color> colorsList = [
-  Colors.red.shade800,
-  Colors.orange.shade900,
-  Colors.orange.shade800,
-  Colors.orange.shade700,
-  Colors.orange.shade600,
-  Colors.orange.shade500,
-  Colors.orange.shade400,
-  Colors.orange.shade300,
+  Colors.blue.shade900,
+  Colors.blue.shade800,
+  Colors.blue.shade700,
+  Colors.blue.shade600,
+  Colors.blue.shade500,
+  Colors.blue.shade400,
+  Colors.blue.shade300,
 ];
 
 class NewTaskList extends StatefulWidget {

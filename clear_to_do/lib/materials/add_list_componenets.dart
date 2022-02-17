@@ -32,6 +32,11 @@ class _AddListWidgetState extends State<AddListWidget> {
                 alignment: Alignment.center,
                 color: Colors.black,
                 child: TextField(
+                  onSubmitted: (value) async {
+                    userGeneratedValue = userValue;
+                    await widget.buttonFunction();
+                    searchController.clear();
+                  },
                   controller: searchController,
                   onChanged: (value) {
                     userValue = value;
@@ -47,7 +52,15 @@ class _AddListWidgetState extends State<AddListWidget> {
                       hintStyle: TextStyle(color: Colors.white)),
                 ),
               )),
-          Expanded(
+        ],
+      ),
+    );
+  }
+}
+
+//add button 
+/*
+Expanded(
             flex: 1,
             child: InkWell(
               onTap: () async {
@@ -64,8 +77,4 @@ class _AddListWidgetState extends State<AddListWidget> {
               ),
             ),
           )
-        ],
-      ),
-    );
-  }
-}
+*/
