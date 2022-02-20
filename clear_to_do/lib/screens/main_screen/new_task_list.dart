@@ -2,8 +2,8 @@
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
-import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
-import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/unused_files/main_sub_screen.dart';
+import 'package:clear_to_do/unused_files/task_list_firestore.dart';
 import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,7 +61,8 @@ class _NewTaskListState extends State<NewTaskList> {
         collectionReference.snapshots();
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -225,29 +226,32 @@ class _NewWidgetState extends State<NewWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              EditableText(
-                onSubmitted: (value) {
-                  FocusScope.of(context).unfocus();
-                  FirebaseFirestore.instance
-                      .collection('collection')
-                      .doc(widget.parentId)
-                      .collection('tasks')
-                      .doc(widget.item['id'])
-                      .update({'title': textEditingController.text}).then(
-                          (value) {
-                    setState(() {});
-                  });
-                },
-                backgroundCursorColor: Colors.black,
-                cursorColor: Colors.black,
-                focusNode: myfocus,
-                controller: textEditingController,
-                // widget.title,
-                style: GoogleFonts.quicksand(
-                  fontSize: 30,
-                  color: Colors.white,
-                  decoration:
-                      (widget.isDone) ? TextDecoration.lineThrough : null,
+              Container(
+                width: 300,
+                child: EditableText(
+                  onSubmitted: (value) {
+                    FocusScope.of(context).unfocus();
+                    FirebaseFirestore.instance
+                        .collection('collection')
+                        .doc(widget.parentId)
+                        .collection('tasks')
+                        .doc(widget.item['id'])
+                        .update({'title': textEditingController.text}).then(
+                            (value) {
+                      setState(() {});
+                    });
+                  },
+                  backgroundCursorColor: Colors.black,
+                  cursorColor: Colors.black,
+                  focusNode: myfocus,
+                  controller: textEditingController,
+                  // widget.title,
+                  style: GoogleFonts.quicksand(
+                    fontSize: 30,
+                    color: Colors.white,
+                    decoration:
+                        (widget.isDone) ? TextDecoration.lineThrough : null,
+                  ),
                 ),
               ),
               Visibility(

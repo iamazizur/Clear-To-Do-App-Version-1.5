@@ -1,8 +1,8 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/model/models.dart';
-import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
-import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/unused_files/main_sub_screen.dart';
+import 'package:clear_to_do/unused_files/task_list_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

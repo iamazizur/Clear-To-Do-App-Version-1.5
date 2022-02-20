@@ -2,16 +2,16 @@
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
-import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
+import 'package:clear_to_do/unused_files/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
-import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/unused_files/task_list_firestore.dart';
 import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import '../splashScreens/splash_screens.dart';
+import '../screens/splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MainScreenCustomIndicator extends StatefulWidget {

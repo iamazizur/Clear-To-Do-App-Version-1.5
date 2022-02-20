@@ -2,9 +2,9 @@
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
-import 'package:clear_to_do/screens/main_screen/main_sub_screen.dart';
+import 'package:clear_to_do/unused_files/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
-import 'package:clear_to_do/screens/main_screen/task_list_firestore.dart';
+import 'package:clear_to_do/unused_files/task_list_firestore.dart';
 import 'package:clear_to_do/utils/firestore_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,9 +43,10 @@ class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
   Widget build(BuildContext context) {
     Stream<QuerySnapshot<Map<String, dynamic>>> snapshot =
         collectionReference.snapshots();
-    var color = Colors.black;
+    // var color = Colors.black;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.black,
+      // resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -87,8 +88,7 @@ class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       var items = snapshot.data!.docs;
-                      var x = items.map((e) => e).toList();
-                      print(x);
+
                       List<dynamic> finalLists =
                           firestoreFunctions.generateList(items);
                       return ReorderableListView.builder(
@@ -114,6 +114,7 @@ class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
                           final TextEditingController textEditingController =
                               TextEditingController(text: title);
                           final String id = finalLists[index]['id'];
+
                           return NewWidget(
                               key: ValueKey(id),
                               id: id,

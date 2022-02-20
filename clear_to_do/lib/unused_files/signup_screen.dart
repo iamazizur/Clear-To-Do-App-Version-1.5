@@ -2,9 +2,9 @@
 
 import 'dart:ui';
 
-import 'package:clear_to_do/materials/login_components.dart';
-import 'package:clear_to_do/screens/main_screen/main_screen.dart';
-import 'package:clear_to_do/screens/sign_in_screen.dart';
+import 'package:clear_to_do/unused_files/login_components.dart';
+import 'package:clear_to_do/unused_files/main_screen.dart';
+import 'package:clear_to_do/unused_files/sign_in_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

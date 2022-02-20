@@ -3,7 +3,7 @@ import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/model/models.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import '../splashScreens/splash_screens.dart';
+import '../screens/splashScreens/splash_screens.dart';
 
 class MainSubScreen extends StatefulWidget {
   static const String id = 'MainSubScreen';

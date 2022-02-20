@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, unused_field, prefer_final_fields
-import 'package:clear_to_do/materials/login_components.dart';
-import 'package:clear_to_do/screens/main_screen/main_screen.dart';
-import 'package:clear_to_do/screens/signup_screen.dart';
+import 'package:clear_to_do/unused_files/login_components.dart';
+import 'package:clear_to_do/unused_files/main_screen.dart';
+import 'package:clear_to_do/unused_files/signup_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
