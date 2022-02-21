@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors,prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, unused_import, avoid_print, prefer_typing_uninitialized_variables, unused_element, must_be_immutable, unused_field, avoid_unnecessary_containers, unused_local_variable, sized_box_for_whitespace
 
 import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
+import 'package:clear_to_do/screens/splashScreens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -47,7 +48,9 @@ class _SettingsState extends State<Settings> {
             MyList(
               size: size,
               title: 'Guide',
-              ontap: () {},
+              ontap: () {
+                Navigator.pushNamed(context, SplashScreen.id);
+              },
               index: 2,
             ),
             MyList(
