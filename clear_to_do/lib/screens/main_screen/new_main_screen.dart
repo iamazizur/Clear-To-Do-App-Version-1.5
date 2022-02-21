@@ -2,6 +2,7 @@
 import 'package:clear_to_do/materials/add_list_componenets.dart';
 import 'package:clear_to_do/materials/delete_check_widget.dart';
 import 'package:clear_to_do/model/models.dart';
+import 'package:clear_to_do/screens/main_screen/settings.dart' as newSetting;
 import 'package:clear_to_do/unused_files/main_sub_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
 import 'package:clear_to_do/unused_files/task_list_firestore.dart';
@@ -13,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../splashScreens/splash_screens.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import './settings.dart';
 
 List<Color> colorsList = [
   Colors.red.shade800,
@@ -45,6 +47,15 @@ class _NewMainScreenFirebaseState extends State<NewMainScreenFirebase> {
         collectionReference.snapshots();
     // var color = Colors.black;
     return Scaffold(
+      floatingActionButton: IconButton(
+        onPressed: () {
+          Navigator.pushNamed(context, newSetting.Settings.id);
+        },
+        icon: Icon(
+          Icons.settings,
+          color: Colors.white,
+        ),
+      ),
       backgroundColor: Colors.black,
       // resizeToAvoidBottomInset: false,
       body: SafeArea(

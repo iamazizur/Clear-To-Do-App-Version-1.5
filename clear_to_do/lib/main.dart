@@ -2,6 +2,7 @@
 
 import 'package:clear_to_do/screens/main_screen/new_main_screen.dart';
 import 'package:clear_to_do/screens/main_screen/new_task_list.dart';
+import 'package:clear_to_do/screens/main_screen/settings.dart';
 import 'package:flutter/material.dart';
 import 'screens/splashScreens/splash_screen.dart';
 import 'firebase_options.dart';
@@ -27,11 +28,12 @@ class ClearToDo extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Clear To Do',
-      initialRoute: SplashScreen.id,
+      initialRoute: NewMainScreenFirebase.id,
       routes: {
         NewTaskList.id: (context) => NewTaskList(parentId: ""),
         NewMainScreenFirebase.id: (context) => NewMainScreenFirebase(),
         SplashScreen.id: (context) => SplashScreen(),
+        Settings.id: (context) => Settings()
       },
     );
   }
